@@ -10,7 +10,7 @@ function setup() {
 
     createCanvas(400, 400);
 
-    frameRate(5);
+    //frameRate(5);
     
     maze = new Maze(width,height);
     
@@ -70,7 +70,7 @@ class Maze {
     constructor(w,h,cols,rows){
         this.grid = [];
         this.stack  = [];
-        this.cellSize = 20;
+        this.cellSize = 40;
         this.currentCell = null;
         this.WallPositions = {
             TOP: 0,
@@ -201,9 +201,9 @@ show() {
     let h = this.h;
 
 
+    noStroke();
     stroke(255);
     noFill();
-    
 
     //Draw walls
     this.walls.forEach(wall => {
@@ -215,15 +215,15 @@ show() {
     });
     
     //Draw visited state;
-    noStroke();
-    if (this.visited === true) {
-        fill(0,255,0,255);
-        rect(x,y,w,h);
-    }
-    if (this.maze.stack.indexOf(this) > -1){
-        fill(255,0,0,255);
-        rect(x,y,w,h);
-    }
+     noStroke();
+    // if (this.maze.stack.indexOf(this) > -1){
+    //     fill(0,0,100,100);
+    //     rect(x,y,w,h);
+    // }
+    // else if (this.visited === true) {
+    //     fill(0,255,0,255);
+    //     rect(x,y,w,h);
+    // }
     if (this.highlighted) {
         fill(0,0,255,255);
         rect(x,y,w,h);
