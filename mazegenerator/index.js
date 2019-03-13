@@ -9,11 +9,15 @@ function preload() {
 function setup() {
 
     createCanvas(400, 400);
-    maze = new Maze(width,height);
 
+    frameRate(5);
+    
+    maze = new Maze(width,height);
+    
     cols = floor(width / maze.cellSize);
     rows = floor(height / maze.cellSize);
 
+    maze.setRowsAndCols(rows,cols);
 
     for (let j = 0; j < rows; j++) {
         for (let i = 0; i < cols; i++) {
@@ -28,12 +32,30 @@ function setup() {
 
 function draw() {
     background(51);
-
+    
     maze.currentCell.visited = true;
+    maze.currentCell.highlight(true);
     
     maze.grid.forEach(cell => {
         cell.show();
+        cell.highlight(false);
     });
+
+    let nextCell = maze.currentCell.checkNeighbors();
+
+    if (nextCell) {
+        
+        //nextCell.visited = true;
+        
+        maze.stack.push(maze.currentCell);
+
+        maze.removeWalls(maze.currentCell,nextCell);
+        
+        maze.currentCell = nextCell;
+    }
+    else if (maze.stack.length > 0 ) {
+        maze.currentCell = maze.stack.pop();
+    }
 
 
 }
@@ -45,9 +67,10 @@ function draw() {
 
 
 class Maze {
-    constructor(w,h){
+    constructor(w,h,cols,rows){
         this.grid = [];
-        this.cellSize = 40;
+        this.stack  = [];
+        this.cellSize = 20;
         this.currentCell = null;
         this.WallPositions = {
             TOP: 0,
@@ -55,12 +78,40 @@ class Maze {
             BOTTOM: 2,
             LEFT: 3
         }
+        this.columns = null;
+        this.rows = null;
     }
 
+    setRowsAndCols(cols,rows) {
+        this.columns = cols;
+        this.rows = rows;
+    }
     addCell(cell){
         this.grid.push(cell);
     }
+    removeWalls(currentCell,nextCell) {
+        let maze = currentCell.maze;
+        let x = currentCell.i - nextCell.i;
+        let y = currentCell.j - nextCell.j;
 
+        if (x === 1 ){
+            currentCell.walls[maze.WallPositions.LEFT].visible = false;
+            nextCell.walls[maze.WallPositions.RIGHT].visible = false;
+        }
+        else if (x === -1) {
+            currentCell.walls[maze.WallPositions.RIGHT].visible = false;
+            nextCell.walls[maze.WallPositions.LEFT].visible = false;
+        }
+
+        if (y === 1 ){
+            currentCell.walls[maze.WallPositions.TOP].visible = false;
+            nextCell.walls[maze.WallPositions.BOTTOM].visible = false;
+        }
+        else if (y === -1) {
+            currentCell.walls[maze.WallPositions.BOTTOM].visible = false;
+            nextCell.walls[maze.WallPositions.TOP].visible = false;
+        }
+    }
 
 }
 
@@ -108,6 +159,41 @@ class Cell {
 
 }
 
+getIndex(i,j) {
+
+    if (i < 0 || j < 0 || i > this.maze.columns-1 || j > this.maze.rows-1) {
+       return -1; 
+    }
+
+    return i + j * this.maze.columns;
+}
+checkNeighbors(){
+    let neighbors = [];
+    let notVisitedNeighbors = [];
+    neighbors.push(maze.grid[this.getIndex(this.i,this.j+1)]);
+    neighbors.push(maze.grid[this.getIndex(this.i+1,this.j)]);
+    neighbors.push(maze.grid[this.getIndex(this.i,this.j-1)]);
+    neighbors.push(maze.grid[this.getIndex(this.i-1,this.j)]);
+
+    neighbors.forEach(neighbor => {
+        //Neighbor could be null from abovei f outside of index bounds.
+        if (neighbor != null && neighbor!= undefined && neighbor.visited === false) {
+            notVisitedNeighbors.push(neighbor);
+        }
+    });
+
+    if (notVisitedNeighbors.length > 0) {
+        let rando = floor(random(0,notVisitedNeighbors.length));
+        return notVisitedNeighbors[rando];
+    }
+    else {
+        return undefined;
+    }
+
+}
+highlight(highlight){
+   this.highlighted = highlight; 
+}
 show() {
     let x = this.i * this.maze.cellSize;
     let y = this.j * this.maze.cellSize;
@@ -129,8 +215,17 @@ show() {
     });
     
     //Draw visited state;
+    noStroke();
     if (this.visited === true) {
-        fill(255,0,255,100);
+        fill(0,255,0,255);
+        rect(x,y,w,h);
+    }
+    if (this.maze.stack.indexOf(this) > -1){
+        fill(255,0,0,255);
+        rect(x,y,w,h);
+    }
+    if (this.highlighted) {
+        fill(0,0,255,255);
         rect(x,y,w,h);
     }
 
