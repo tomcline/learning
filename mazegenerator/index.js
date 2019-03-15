@@ -8,7 +8,13 @@ function preload() {
 
 function setup() {
 
-    createCanvas(400, 400);
+    let winWidth = window.innerWidth;
+    let winHeight = window.innerHeight;
+    
+    if (winWidth > winHeight) winWidth = winHeight;
+    else if (winHeight > winWidth) winHeight = winWidth;
+
+    createCanvas(winWidth, winHeight);
 
     //frameRate(5);
     
@@ -16,25 +22,26 @@ function setup() {
     
     
     maze.initialize(width,height);
+    maze.buildMaze();
 }
 
 
 function draw() {
     background(51);
-    maze.draw();
-    maze.drawPathSolution();
+            maze.solveMaze();
+
+            maze.generateSolutionPath();
+
+            // maze.drawOpenset();
+            // maze.drawClosedSet();
+           
+            maze.drawPathSolution();
+
+            maze.draw();
+
+            
     
-    if (!maze.isInitialized){
-        maze.buildMaze();
-    }
-    else {
-        maze.solveMaze();
-    }
     
-    
-    //maze.drawOpenset();
-    //maze.drawClosedSet();
-   
     
 }
 
@@ -87,24 +94,31 @@ class Maze {
 
     }
     buildMaze(){
-        let nextCell = this.currentCell.checkNeighbors();
         
-        if (nextCell) {
+        while (!maze.isInitialized) {
+
+            let nextCell = this.currentCell.checkNeighbors();
             
-            nextCell.visited = true;
-            
-            this.stack.push(this.currentCell);
-            
-            this.removeWalls(this.currentCell,nextCell);
-            
-            this.currentCell = nextCell;
+            if (nextCell) {
+                
+                nextCell.visited = true;
+                
+                this.stack.push(this.currentCell);
+                
+                this.removeWalls(this.currentCell,nextCell);
+                
+                this.currentCell = nextCell;
+            }
+            else if (this.stack.length > 0 ) {
+                this.currentCell = maze.stack.pop();
+            }
+            else {
+                this.prepareMazeToSolve();
+            }
+
+
         }
-        else if (this.stack.length > 0 ) {
-            this.currentCell = maze.stack.pop();
-        }
-        else {
-            this.prepareMazeToSolve();
-        }
+        
 
 
     }
@@ -123,8 +137,8 @@ class Maze {
     }
     draw(){
         
-        this.currentCell.visited = true;
-        this.currentCell.highlight(true);
+        //this.currentCell.visited = true;
+        //this.currentCell.highlight(true);
         
         
         this.grid.forEach(cell => {
@@ -147,10 +161,32 @@ class Maze {
         });
     }
     drawPathSolution(){
-        this.pathSolution.forEach(cell => {
-            cell.color = color(255,255,0);
-        });
         
+        noFill();
+        beginShape();
+        for (var i = 0; i < this.pathSolution.length; i++) {
+            let cell = this.pathSolution[i];
+            stroke(125, 125, 255);
+            //strokeWeight(cell.w / 2);
+            vertex(cell.i * cell.w + cell.w / 2, cell.j * cell.h + cell.h / 2);
+        }
+        endShape();
+        
+        
+        
+        // this.pathSolution.forEach(cell => {
+        //     cell.color = color(200,200,0);
+        // });
+        
+    }
+    generateSolutionPath(){
+        this.pathSolution = [];
+        let temp = this.currentCell;
+        this.pathSolution.push(temp);
+        while(temp.previous !== undefined && temp.previous !== null) {
+            this.pathSolution.push(temp.previous);
+            temp = temp.previous;
+        }
     }
     solve(){
         let winner = 0;
@@ -165,21 +201,23 @@ class Maze {
             }
         }
         
-        let current = this.openSet[winner];
+        this.currentCell = this.openSet[winner];
         
-        if (current === this.end) {
+        if (this.currentCell === this.end) {
             noLoop();
             console.log("Solved!");
         }
 
-            this.openSet = this.openSet.filter(item => item !== current);
-            this.closedSet.push(current);
+            this.openSet = this.openSet.filter(item => item !== this.currentCell);
+            this.closedSet.push(this.currentCell);
             
-            let neighbors = current.visitableNeighbors;
-            let newPath = false;
+            let neighbors = this.currentCell.visitableNeighbors;
             neighbors.forEach(neighbor => {
-                if (!this.closedSet.includes(neighbor) && current.visitableNeighbors.includes(neighbor)) {
-                    let tempGScore = current.gScore+this.calculateHeuristic(neighbor,current) ;
+                if (!this.closedSet.includes(neighbor) && this.currentCell.visitableNeighbors.includes(neighbor)) {
+                    
+                    let tempGScore = this.currentCell.gScore + this.calculateHeuristic(neighbor,this.currentCell) ;
+                    let newPath = false;
+                    
                     if (this.openSet.includes(neighbor)  ) {
                         if (tempGScore < neighbor.gScore){
                             neighbor.gScore = tempGScore;
@@ -195,31 +233,29 @@ class Maze {
                     if (newPath) {
                         neighbor.hScore = this.calculateHeuristic(neighbor,this.end);
                         neighbor.fScore = neighbor.gScore + neighbor.hScore;
-                        neighbor.previous = current;
+                        neighbor.previous = this.currentCell;
                     }
     
                 }
             });
 
 
-        this.pathSolution = [];
-        let temp = current;
-        this.pathSolution.push(temp);
-        while(temp.previous !== undefined && temp.previous !== null) {
-            this.pathSolution.push(temp.previous);
-            temp = temp.previous;
-        }
+       
 
 
     }
     calculateHeuristic(a,b){
-        let distance = abs(a.i-b.i) + abs(a.j-b.j);
-        //dist(a.i,a.j,b.i,b.j);   
+        //let distance = abs(a.i-b.i) + abs(a.j-b.j);
+        let distance = dist(a.i,a.j,b.i,b.j);   
         return distance;
     }
     prepareMazeToSolve(){
-        this.start = this.grid[0];
-        this.end = this.grid[floor(random(this.grid.length-1))];
+        function setStartAndEnd(maze){
+            maze.start = maze.grid[floor(random(maze.grid.length-1))];
+            maze.end = maze.grid[floor(random(maze.grid.length-1))];
+            if (maze.start === maze.end) setStartAndEnd();
+        }
+        setStartAndEnd(this);
         this.start.type = 'START';
         this.end.type = 'END'; 
         this.isInitialized = true;
