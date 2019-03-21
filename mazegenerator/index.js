@@ -1,3 +1,15 @@
+
+/////*********    TODO    **************////////////////////
+
+/*
+
+Convert A* to take a grid and solve it in isolation.
+     - All solving logic is self contained.
+     - Neighbors,etc.
+     
+*/ 
+
+
 let maze;
 let ememy;
 
