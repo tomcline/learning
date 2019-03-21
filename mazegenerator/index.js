@@ -16,17 +16,17 @@ function setup() {
 
     createCanvas(winWidth, winHeight);
 
-    frameRate(10);
+    //frameRate(10);
 
     maze = new Maze(width, height);
 
     maze.initialize(width, height);
     maze.buildMaze();
-    maze.AStar.solve();
-
+    
+    
+    
     enemy = new Enemy(maze);
     
-   //enemy.AStar.solve();
 }
 
 
@@ -38,7 +38,11 @@ function draw() {
         //     maze.reset();
         // }
         
+        maze.AStar.solve();
+        maze.AStar.generateSolutionPath();
         
+        enemy.AStar.solve();
+        enemy.AStar.generateSolutionPath();
         
         maze.draw();
         
@@ -46,11 +50,9 @@ function draw() {
         
         enemy.show();
         
-        maze.AStar.generateSolutionPath();
         maze.AStar.drawPathSolution();
         
-    // enemy.AStar.generateSolutionPath();
-    // enemy.AStar.drawPathSolution();
+        enemy.AStar.drawPathSolution();
 
 
 }
@@ -201,7 +203,7 @@ class Maze {
 
         this.player = new Player(this.end.i, this.end.j, this.end.w, this.end.h, this);
 
-        this.AStar = new AStar(this.start,this.end, color(0, 255, 0,200));
+        this.AStar = new AStar(this.start,this.end, color(0, 255, 0,175));
 
         this.isInitialized = true;
         //this.openSet.push(this.start);
@@ -490,7 +492,7 @@ class Enemy extends Player {
         this.setOrigin(tempCell);
         this.setTarget(maze.end);
         
-        this.AStar = new AStar(this.origin,this.target,color(255, 0, 0,200));
+        this.AStar = new AStar(this.origin,this.target,color(255, 0, 0,175));
 
         
     }
@@ -587,7 +589,7 @@ class AStar {
     }
     solve() {
 
-        while (this.openSet.length > 0) {
+        if (this.openSet.length > 0) {
 
 
             let winner = 0;
@@ -639,6 +641,9 @@ class AStar {
 
                 }
             });
+        }
+        else {
+            console.log("No solution");
         }
 
         //return false;
