@@ -6,7 +6,7 @@
 Convert A* to take a grid and solve it in isolation.
      - All solving logic is self contained.
      - Neighbors,etc.
-     
+
 */ 
 
 
@@ -50,11 +50,6 @@ function draw() {
         //     maze.reset();
         // }
         
-        maze.AStar.solve();
-        maze.AStar.generateSolutionPath();
-        
-        enemy.AStar.solve();
-        enemy.AStar.generateSolutionPath();
         
         maze.draw();
         
@@ -62,9 +57,30 @@ function draw() {
         
         enemy.show();
         
+
+        if (maze.AStar.solved === false) {
+            maze.AStar.solve();
+        }
+        maze.AStar.generateSolutionPath();
         maze.AStar.drawPathSolution();
+
+
+        // maze.grid.forEach(cell => {
+        //     cell.fScore = 0;
+        //     cell.hScore = 0;
+        //     cell.gScore = 0;
+        //     cell.previous = null;
+        // });
         
+        if (enemy.AStar.solved === false) {
+            enemy.AStar.solve();
+        }
+        enemy.AStar.generateSolutionPath();
         enemy.AStar.drawPathSolution();
+        
+        
+        
+        
 
 
 }
@@ -543,7 +559,7 @@ class AStar {
         this.pathSolution = [];
         this.currentCell = null;
         this.pathColor = color;
-        
+        this.solved = false;
         this.setOrigin(origin);
         this.setTarget(target);
 
@@ -578,7 +594,6 @@ class AStar {
 
     }
     drawPathSolution() {
-
         noFill();
         beginShape();
         for (var i = 0; i < this.pathSolution.length; i++) {
@@ -618,6 +633,7 @@ class AStar {
 
 
             if (this.currentCell === this.target) {
+                this.solved = true;
                 return true;
                 //noLoop();
             }
