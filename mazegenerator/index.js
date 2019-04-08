@@ -12,6 +12,7 @@ Convert A* to take a grid and solve it in isolation.
 
 let maze;
 let ememy;
+let player;
 
 function preload() {
 
@@ -28,7 +29,7 @@ function setup() {
 
     createCanvas(winWidth, winHeight);
 
-    //frameRate(10);
+    frameRate(5);
 
     maze = new Maze(width, height);
 
@@ -37,50 +38,55 @@ function setup() {
     
     
     
-    enemy = new Enemy(maze);
+    enemy = new Enemy(maze,maze.cellSize,maze.cellSize);
+    player = new Player(maze,maze.cellSize,maze.cellSize);
     
+    enemy.AStar = new AStar(maze.getCell(enemy.i,enemy.j),maze.getCell(player.i,player.j), color(255, 255, 0,175));
+
+
+    maze.AStar.solve();
+    maze.AStar.generateSolutionPath();
+
+
+    //enemy.AStar.solve();
+    //enemy.AStar.generateSolutionPath();
+
 }
 
 
 function draw() {
-    background(51);
+        
+        background(51);
     
-    //3 Seconds to solve....
-    // if (frameCount % 180 == 0 ){
-        //     maze.reset();
-        // }
+        maze.resetCellValues();
+   
         
-        
-        maze.draw();
-        
-        maze.player.show();
-        
+        maze.draw();       
+        player.show();      
         enemy.show();
-        
-
-        if (maze.AStar.solved === false) {
-            maze.AStar.solve();
-        }
-        maze.AStar.generateSolutionPath();
         maze.AStar.drawPathSolution();
-
-
-        // maze.grid.forEach(cell => {
-        //     cell.fScore = 0;
-        //     cell.hScore = 0;
-        //     cell.gScore = 0;
-        //     cell.previous = null;
-        // });
         
-        if (enemy.AStar.solved === false) {
-            enemy.AStar.solve();
-        }
+        enemy.AStar.setOrigin(maze.getCell(enemy.i,enemy.j));
+        enemy.AStar.setTarget(maze.getCell(player.i,player.j));
+        
+        
+        enemy.AStar.solve();
         enemy.AStar.generateSolutionPath();
+        
+        
         enemy.AStar.drawPathSolution();
+        let newCell = enemy.AStar.pathSolution[enemy.AStar.pathSolution.length-2];
+        enemy.move(newCell.i,newCell.j);
         
         
+        enemy.AStar.reset();
+
+
         
         
+        if (maze.AStar.solved === true) {
+            //noLoop();
+        }
 
 
 }
@@ -92,7 +98,6 @@ class Maze {
         this.start = null;
         this.end = null;
         this.grid = [];
-        this.player = null;
         this.AStar = null;
         this.pathSolution = [];
         this.stack = [];
@@ -145,6 +150,13 @@ class Maze {
         this.grid.forEach(cell => {
             cell.show();
             cell.highlight(false);
+        });
+
+    }
+    resetCellValues(){
+
+        this.grid.forEach(cell => {
+            cell.reset();
         });
 
     }
@@ -222,16 +234,18 @@ class Maze {
         //Single index array indexing trick....
         return i + j * this.columns;
     }
+    getCell(i,j){
+        return this.grid[this.getIndex(i, j)];
+    }
     updateEndPosiiton(i, j) {
         this.end = this.grid[this.getIndex(i, j)];
-        this.AStar.target = this.end;
     }
     prepareMazeToSolve() {
         this.setStartAndEnd();
 
-        this.player = new Player(this.end.i, this.end.j, this.end.w, this.end.h, this);
+       // this.player = new Player(this.end.i, this.end.j, this.end.w, this.end.h, this);
 
-        this.AStar = new AStar(this.start,this.end, color(0, 255, 0,175));
+        this.AStar = new AStar(this.start,this.end, color(0, 255, 255,175));
 
         this.isInitialized = true;
         //this.openSet.push(this.start);
@@ -246,33 +260,35 @@ class Maze {
         let x = currentCell.i - nextCell.i;
         let y = currentCell.j - nextCell.j;
 
-
        
 
+            if (x === 1) {
+                currentCell.walls[maze.WallPositions.LEFT].visible = false;
+                nextCell.walls[maze.WallPositions.RIGHT].visible = false;
+                currentCell.visitableNeighbors.push(nextCell);
+                nextCell.visitableNeighbors.push(currentCell);
+            } else if (x === -1) {
+                currentCell.walls[maze.WallPositions.RIGHT].visible = false;
+                nextCell.walls[maze.WallPositions.LEFT].visible = false;
+                currentCell.visitableNeighbors.push(nextCell);
+                nextCell.visitableNeighbors.push(currentCell);
+            }
+    
+            if (y === 1) {
+                currentCell.walls[maze.WallPositions.TOP].visible = false;
+                nextCell.walls[maze.WallPositions.BOTTOM].visible = false;
+                currentCell.visitableNeighbors.push(nextCell);
+                nextCell.visitableNeighbors.push(currentCell);
+            } else if (y === -1) {
+                currentCell.walls[maze.WallPositions.BOTTOM].visible = false;
+                nextCell.walls[maze.WallPositions.TOP].visible = false;
+                currentCell.visitableNeighbors.push(nextCell);
+                nextCell.visitableNeighbors.push(currentCell);
+            }
 
-        if (x === 1) {
-            currentCell.walls[maze.WallPositions.LEFT].visible = false;
-            nextCell.walls[maze.WallPositions.RIGHT].visible = false;
-            currentCell.visitableNeighbors.push(nextCell);
-            nextCell.visitableNeighbors.push(currentCell);
-        } else if (x === -1) {
-            currentCell.walls[maze.WallPositions.RIGHT].visible = false;
-            nextCell.walls[maze.WallPositions.LEFT].visible = false;
-            currentCell.visitableNeighbors.push(nextCell);
-            nextCell.visitableNeighbors.push(currentCell);
-        }
+            
 
-        if (y === 1) {
-            currentCell.walls[maze.WallPositions.TOP].visible = false;
-            nextCell.walls[maze.WallPositions.BOTTOM].visible = false;
-            currentCell.visitableNeighbors.push(nextCell);
-            nextCell.visitableNeighbors.push(currentCell);
-        } else if (y === -1) {
-            currentCell.walls[maze.WallPositions.BOTTOM].visible = false;
-            nextCell.walls[maze.WallPositions.TOP].visible = false;
-            currentCell.visitableNeighbors.push(nextCell);
-            nextCell.visitableNeighbors.push(currentCell);
-        }
+
 
        
     }
@@ -286,7 +302,6 @@ class Cell {
         this.j = j;
         this.w = w;
         this.h = h;
-        this.previous = null;
         this.color = null;
         this.maze = maze;
         this.visited = false;
@@ -294,6 +309,7 @@ class Cell {
         this.fScore = 0;
         this.gScore = 0;
         this.hScore = 0;
+        this.previous = null;
         this.neighbors = null;
         this.visitableNeighbors = [];
 
@@ -329,7 +345,12 @@ class Cell {
 
     }
     
-
+    reset(){
+        this.fScore = 0;
+        this.gScore = 0;
+        this.hScore = 0;
+        this.previous = null;
+    }
     addNeighbors() {
         let neighbors = [];
         neighbors.push(this.maze.grid[this.maze.getIndex(this.i, this.j + 1)]);
@@ -386,13 +407,13 @@ class Cell {
         }
 
         if (this.type == "START") {
-            fill(255, 150, 100);
+            fill(0, 255, 0);
             rect(x, y, w, h);
         }
-        // else if (this.type == "END") {
-        //     fill(255,0,255);
-        //     rect(x,y,w,h);
-        // }
+        else if (this.type == "END") {
+            fill(255,0,0);
+            rect(x,y,w,h);
+        }
         else if (this.color) {
             fill(this.color);
             rect(x, y, w, h);
@@ -419,18 +440,41 @@ class Cell {
 
 
 class Player extends Cell {
-    constructor(i, j, w, h, maze) {
+    constructor(maze,height,width) {
+        
+        let i,j,w,h,tempCell;
+
+        h = height;
+        w = width;
+
+        function determinePosition(){
+            tempCell = maze.grid[floor(random(maze.grid.length - 1))];
+            if (tempCell === maze.start || tempCell === maze.end) {
+                //determinePosition();
+            }
+            return tempCell;
+        }
+        
+        tempCell = determinePosition();
+        
+        i = tempCell.i;
+        j = tempCell.j;
+        
+        
         super(i, j, w, h, maze);
         this.type = 'PLAYER';
-        this.color = color(0, 0, 255, 255);
+        this.color = color(0, 0, 255);
+
+
+
     }
     canMoveTo(newI,newJ) {
         let futureCell;
         let currentCell;
 
-        futureCell = this.maze.grid[this.maze.getIndex(newI, newJ)];
+        futureCell = this.maze.getCell(newI, newJ);
 
-        currentCell = this.maze.grid[this.maze.getIndex(this.i,this.j)];
+        currentCell = this.maze.getCell(this.i,this.j);
 
         //Check if we can move here....
         return currentCell.visitableNeighbors.includes(futureCell);
@@ -460,19 +504,21 @@ class Player extends Cell {
             newJ = 1;
         }
 
+
+
         newI = this.i + newI;
         newJ = this.j + newJ;
 
         if (this.canMoveTo(newI,newJ)) {
             this.i = newI;
             this.j = newJ;
-            this.maze.updateEndPosiiton(this.i, this.j);
+            // this.maze.updateEndPosiiton(this.i, this.j);
 
-            this.maze.AStar.reset();
-            this.maze.AStar.setOrigin(this.maze.start);
-            this.maze.AStar.setTarget(this.maze.end);
+            // this.maze.AStar.reset();
+            // this.maze.AStar.setOrigin(this.maze.start);
+            // this.maze.AStar.setTarget(this.maze.end);
 
-            this.maze.AStar.solve();
+            // this.maze.AStar.solve();
 
         }
 
@@ -490,62 +536,20 @@ class Player extends Cell {
 }
 
 class Enemy extends Player {
-    constructor(maze) {
-        let i,j,w,h,tempCell;
-        h = maze.player.h;
-        w = maze.player.w;
-
-        function determinePosition(){
-            tempCell = maze.grid[floor(random(maze.grid.length - 1))];
-            if (tempCell === maze.start || tempCell === maze.end) {
-                //determinePosition();
-            }
-            return tempCell;
-        }
-        
-        tempCell = determinePosition();
-        
-        i = tempCell.i;
-        j = tempCell.j;
-        
-        super(i, j, w, h, maze);
+    constructor(maze,height,width) {
+        super(maze,height,width);
         
         this.type = 'ENEMY';
         this.color = color(255,255,255,200);
         
-        //tempCell = maze.grid[maze.getIndex(i,j)];
-        
-        
-        
-        this.setOrigin(tempCell);
-        this.setTarget(maze.end);
-        
-        this.AStar = new AStar(this.origin,this.target,color(255, 0, 0,175));
 
         
     }
 
-    setOrigin(origin){  
-        this.origin = origin;
-        //this.AStar.setOrigin(origin);
+    move(newI,newJ){
 
-    }
-    setTarget(target){
-        this.target = target;
-        //this.AStar.setTarget(target);
-    }
-
-    move(){
-
-        // this.AStar.reset();
-        // this.AStar.setOrigin(this.origin);
-        // this.AStar.setTarget(this.target);
-
-        // this.AStar.solve();
-
-        // this.AStar.generateSolutionPath();
-        // this.AStar.drawPathSolution();
-
+            this.i = newI;
+            this.j = newJ;
         
     }
 
@@ -569,7 +573,7 @@ class AStar {
         this.openSet = [];
         this.closedSet = [];
         this.pathSolution = [];
-        //this.currentCell = null;
+        this.currentCell = null;
         this.origin = null;
         this.target = null;
     }
@@ -616,7 +620,7 @@ class AStar {
     }
     solve() {
 
-        if (this.openSet.length > 0) {
+        while (this.openSet.length > 0) {
 
 
             let winner = 0;
@@ -635,10 +639,11 @@ class AStar {
             if (this.currentCell === this.target) {
                 this.solved = true;
                 return true;
-                //noLoop();
             }
 
             this.openSet = this.openSet.filter(item => item !== this.currentCell);
+
+
 
             this.closedSet.push(this.currentCell);
 
@@ -670,14 +675,7 @@ class AStar {
                 }
             });
         }
-        else {
-            console.log("No solution");
-        }
 
-        //return false;
-        // else {
-        //     return false;
-        // }
 
     }
     calculateHeuristic(a, b) {
@@ -692,8 +690,8 @@ class AStar {
 
 
 function keyPressed() {
-    // if (maze && maze.isInitialized) {
-    //     maze.player.move(keyCode);
-    // }
+    if (maze && maze.isInitialized) {
+        player.move(keyCode);
+    }
 
 }
