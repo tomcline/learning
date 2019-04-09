@@ -81,8 +81,9 @@ function draw() {
 
             let newPosition = solver.pathSolution[solver.pathSolution.length-2];
             //let newPosition = solver.pathSolution[solver.pathSolution.length];
-
-            enemy.move(newPosition.i,newPosition.j);
+            if (newPosition) {
+                enemy.move(newPosition.i,newPosition.j);
+            }
            
 
         });
@@ -544,26 +545,26 @@ class Enemy extends Player {
     
     if (enemyName == 'RED') {
         this.color = color(255,0,0);
-        this.speed = 40;
+        this.speed = 30;
     }
     
     else if (enemyName == 'GREY') {
         this.color = color(175,175,175);
-        this.speed = 30;
+        this.speed = 20;
     }
     
     else if (enemyName == 'GREEN') {
         this.color = color(0,255,0);
-        this.speed = 20;
+        this.speed = 10;
     }
     
     else if (enemyName == 'YELLOW') {
-        this.color = color(0,255,255);
-        this.speed = 10;
+        this.color = color(255,255,0);
+        this.speed = 5;
     }
     else {
-        this.color = color(255,0,0,100);
-        this.speed = 1;
+        this.color = color(255,150,150);
+        this.speed = 5;
     }
     
 }
@@ -578,7 +579,14 @@ move(newI,newJ){
     }
     show(){
 
-        super.show();
+        //super.show();
+        let x = this.i * maze.cellSize;
+        let y = this.j * maze.cellSize;
+        let w = this.w*.8;
+        let h = this.h*.8;
+        noStroke();
+        fill(this.color);
+        rect(x,y,w,h);
 
     
 
