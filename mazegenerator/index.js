@@ -4,8 +4,8 @@
 /*
 
 Convert A* to take a grid and solve it in isolation.
-     - All solving logic is self contained.
-     - Neighbors,etc.
+- All solving logic is self contained.
+- Neighbors,etc.
 
 */ 
 
@@ -13,8 +13,10 @@ Convert A* to take a grid and solve it in isolation.
 let maze;
 let enemies = [];
 let player;
-function preload() {
+let solver;    
 
+function preload() {
+    
 
 }
 
@@ -28,7 +30,9 @@ function setup() {
 
     createCanvas(winWidth, winHeight);
 
-    //frameRate(30);
+    frameRate(30);
+
+    solver = new AStar();
 
     maze = new Maze(width, height);
 
@@ -43,13 +47,6 @@ function setup() {
     enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'RED',player));
     enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'',player));
 
-    // maze.AStar.solve();
-    // maze.AStar.generateSolutionPath();
-
-
-    //enemy.AStar.solve();
-    //enemy.AStar.generateSolutionPath();
-
 }
 
 
@@ -57,17 +54,12 @@ function draw() {
         
         background(51);
     
-   
-        
         maze.draw();       
         player.show();      
         
         enemies.forEach(enemy => {
 
             maze.resetCellValues();
-
-
-            let solver = new AStar();    
 
             enemy.show();
             
@@ -80,20 +72,17 @@ function draw() {
             solver.drawPathSolution(enemy.color);
 
             let newPosition = solver.pathSolution[solver.pathSolution.length-2];
-            //let newPosition = solver.pathSolution[solver.pathSolution.length];
             if (newPosition) {
                 enemy.move(newPosition.i,newPosition.j);
             }
            
+            solver.reset();
 
         });
 
-       // maze.AStar.drawPathSolution();
-        
-
-        
-        
-
+        if (player.isMoving === true){
+            player.move(player.movementDirection);
+        }
 
 }
 
@@ -373,9 +362,6 @@ class Cell {
 
             let rando = floor(random(0, notVisitedNeighbors.length));
             
-            //console.log(this);
-            //console.log(notVisitedNeighbors);
-            
             return notVisitedNeighbors[rando];
         } else {
             return undefined;
@@ -471,8 +457,10 @@ class Player extends Cell {
         super(i, j, w, h, maze);
         this.type = 'PLAYER';
         this.color = color(0, 0, 255);
-
-
+        this.isMoving = false;
+        this.movementDirection = null;
+        this.previousMovementDirection = null;
+        this.speed = 10;
 
     }
     canMoveTo(newI,newJ) {
@@ -486,44 +474,74 @@ class Player extends Cell {
         //Check if we can move here....
         return currentCell.visitableNeighbors.includes(futureCell);
     }
-    move() {
-        let newI = 0;
-        let newJ = 0;
+    move(keyCode,moveImmediately) {
+     
+        this.previousMovementDirection = this.movementDirection;
         
+        this.movementDirection = keyCode;
+        
+        this.isMoving = true;
 
-
-        if (keyIsDown(LEFT_ARROW)) {
-            newI = -1;
+        function determineNewPosition(keyCode){
+            let newI = 0;
+            let newJ = 0;
             
+            if (keyIsDown(LEFT_ARROW) || keyCode == LEFT_ARROW) {
+                 newI = -1;    
+             }
+     
+             if (keyIsDown(RIGHT_ARROW) || keyCode == RIGHT_ARROW) {
+                 newI = 1;
+                 
+             }
+     
+             if (keyIsDown(UP_ARROW) || keyCode == UP_ARROW) {
+                 newJ = -1;
+                 
+             }
+     
+             if (keyIsDown(DOWN_ARROW) || keyCode == DOWN_ARROW) {
+                 newJ = 1;
+             }
+
+             return {i:newI,j:newJ};
+
+            }
+        if (frameCount % this.speed == 0) {
+
+                let newPosition = determineNewPosition(keyCode);
+
+                if (this.doMove(newPosition.i,newPosition.j)) {
+                    
+                }
+                else {
+                    //We attempted to move somewhere dumb.
+                    //Try moving to previous direction.
+                    let newPosition = determineNewPosition(this.previousMovementDirection);
+                    if (this.doMove(newPosition.i,newPosition.j)) {
+
+                    }
+                    else {
+                        this.isMoving = false;
+                    }
+            }
         }
-
-        if (keyIsDown(RIGHT_ARROW)) {
-            newI = 1;
-            
-        }
-
-        if (keyIsDown(UP_ARROW)) {
-            newJ = -1;
-            
-        }
-
-        if (keyIsDown(DOWN_ARROW)) {
-            newJ = 1;
-        }
-
-
-
-        newI = this.i + newI;
-        newJ = this.j + newJ;
-
-        //if (this.canMoveTo(newI,newJ)) {
-            this.i = newI;
-            this.j = newJ;
-          
-       // }
-
     }
+    doMove(newI,newJ) {
+        if (this.canMoveTo(this.i + newI,this.j + newJ)){
+            //We can move, so say we are moving.
+            this.isMoving = true;
 
+            //Dont move too fast....
+                this.i += newI;
+                this.j += newJ;
+            
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     show() {
         let cell = this;
                 
@@ -542,29 +560,31 @@ class Enemy extends Player {
     let target = maze.getCell(player.i,player.j)
     
     this.type = 'ENEMY';
-    
+    this.speed = 0;
+
+
     if (enemyName == 'RED') {
         this.color = color(255,0,0);
-        this.speed = 30;
+        this.speed = 45;
     }
     
     else if (enemyName == 'GREY') {
         this.color = color(175,175,175);
-        this.speed = 20;
+        this.speed = 35;
     }
     
     else if (enemyName == 'GREEN') {
         this.color = color(0,255,0);
-        this.speed = 10;
+        this.speed = 25;
     }
     
     else if (enemyName == 'YELLOW') {
         this.color = color(255,255,0);
-        this.speed = 5;
+        this.speed = 20;
     }
     else {
         this.color = color(255,150,150);
-        this.speed = 5;
+        this.speed = 15;
     }
     
 }
@@ -730,7 +750,10 @@ class AStar {
 
 function keyPressed() {
     if (maze && maze.isInitialized) {
-        player.move(keyCode);
+\        player.move(keyCode);
+
+        //player.movementDirection = keyCode;
+        //player.move(keyCode,true);
     }
 
 }
