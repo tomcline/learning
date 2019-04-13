@@ -54,7 +54,8 @@ function draw() {
         
         background(51);
     
-        maze.draw();       
+        maze.draw();    
+
         player.show();      
         
         enemies.forEach(enemy => {
@@ -80,9 +81,7 @@ function draw() {
 
         });
 
-        if (player.isMoving === true){
-            player.move(player.movementDirection);
-        }
+        player.move(player.movementDirection);
 
 }
 
@@ -456,33 +455,18 @@ class Player extends Cell {
         
         super(i, j, w, h, maze);
         this.type = 'PLAYER';
-        this.color = color(0, 0, 255);
+        this.color = color(255, 255, 0);
         this.isMoving = false;
         this.movementDirection = null;
         this.previousMovementDirection = null;
-        this.speed = 10;
+        this.speed = 8;
+        this.oldI = 0;
+        this.oldJ = 0;
+        this.mouthAngle = 0;
+        this.mouthOpening = true;
 
     }
-    canMoveTo(newI,newJ) {
-        let futureCell;
-        let currentCell;
-
-        futureCell = maze.getCell(newI, newJ);
-
-        currentCell = maze.getCell(this.i,this.j);
-
-        //Check if we can move here....
-        return currentCell.visitableNeighbors.includes(futureCell);
-    }
-    move(keyCode,moveImmediately) {
-     
-        this.previousMovementDirection = this.movementDirection;
-        
-        this.movementDirection = keyCode;
-        
-        this.isMoving = true;
-
-        function determineNewPosition(keyCode){
+    determineNewPosition(keyCode) {
             let newI = 0;
             let newJ = 0;
             
@@ -506,48 +490,116 @@ class Player extends Cell {
 
              return {i:newI,j:newJ};
 
-            }
+
+
+    }
+    canMoveTo(newI,newJ) {
+        let futureCell;
+        let currentCell;
+
+        futureCell = maze.getCell(newI, newJ);
+
+        currentCell = maze.getCell(this.i,this.j);
+        //Check if we can move here....
+        return currentCell.visitableNeighbors.includes(futureCell);
+    }
+    move(keyCode,moveImmediately) {
+     
+        this.previousMovementDirection = this.movementDirection;
+        
+        if (keyCode != null && keyCode != undefined) {
+            this.movementDirection = keyCode;
+        }
+        
         if (frameCount % this.speed == 0) {
 
-                let newPosition = determineNewPosition(keyCode);
+                let newPosition = this.determineNewPosition(keyCode);
 
-                if (this.doMove(newPosition.i,newPosition.j)) {
-                    
-                }
-                else {
-                    //We attempted to move somewhere dumb.
-                    //Try moving to previous direction.
-                    let newPosition = determineNewPosition(this.previousMovementDirection);
-                    if (this.doMove(newPosition.i,newPosition.j)) {
-
-                    }
-                    else {
-                        this.isMoving = false;
-                    }
-            }
+                this.doMove(newPosition.i,newPosition.j);
         }
     }
-    doMove(newI,newJ) {
-        if (this.canMoveTo(this.i + newI,this.j + newJ)){
-            //We can move, so say we are moving.
-            this.isMoving = true;
+    moveMouth(){
 
-            //Dont move too fast....
-                this.i += newI;
-                this.j += newJ;
-            
-            return true;
+        if (this.mouthOpening){
+            this.mouthAngle+=30;
         }
         else {
-            return false;
+            this.mouthAngle-=30;
         }
+
+        if (this.mouthAngle == 90) {
+            this.mouthOpening = false;
+        }
+        else if (this.mouthAngle == 0 ) {
+            this.mouthOpening = true;
+        }
+
+    }
+    doMove(newI,newJ) {
+        this.isMoving = false;
+        //Can we move to the position from the users input?
+        if (this.canMoveTo(this.i + newI,this.j + newJ)){
+            //We can move, so say we are moving.
+                this.oldI = newI;
+                this.oldJ = newJ;
+                this.isMoving = true;
+        }
+        else {
+            //If we can't move to users direction, can we continue in previous direction?
+            if (this.canMoveTo(this.i + this.oldI,this.j + this.oldJ)){
+                
+                this.movementDirection = null;
+                this.previousMovementDirection = null;
+                this.isMoving = true;
+            }
+        }
+
+        if (this.isMoving === true) {
+            this.i += this.oldI;
+            this.j += this.oldJ;
+        }
+
+
     }
     show() {
         let cell = this;
-                
+        let rotationAngle = 0;
+        //Move mouth twice as fast as movement speed
+         if (frameCount % 4 == 0 ){
+             this.moveMouth();
+         }
+
         noStroke();
         fill(this.color);
-        circle(cell.i * cell.w + cell.w / 2, cell.j * cell.h + cell.h / 2, cell.w / 2);
+        angleMode(DEGREES);
+        switch (this.movementDirection) {
+                case LEFT_ARROW:
+                    rotationAngle = 180;
+                break;
+                case RIGHT_ARROW:
+                    rotationAngle = 0;
+                break;
+                case UP_ARROW:
+                    rotationAngle = 270;
+                break;
+                case DOWN_ARROW:
+                    rotationAngle = 90;
+                break;
+        
+            default:
+                break;
+        }
+        
+
+
+        if (this.mouthAngle > 0 ) {
+//            arc(cell.i * cell.w + cell.w / 2,  cell.j * cell.h + cell.h / 2, cell.w, cell.h, this.mouthAngle/2, 360 - this.mouthAngle/2, PIE);
+            arc(cell.i * cell.w + cell.w / 2,  cell.j * cell.h + cell.h / 2, cell.w, cell.h, rotationAngle+this.mouthAngle/2, rotationAngle - this.mouthAngle/2, PIE);
+        }
+        else {
+            circle(cell.i * cell.w + cell.w / 2, cell.j * cell.h + cell.h / 2, cell.w / 2);
+        }
+
     }
 }
 
@@ -578,8 +630,8 @@ class Enemy extends Player {
         this.speed = 25;
     }
     
-    else if (enemyName == 'YELLOW') {
-        this.color = color(255,255,0);
+    else if (enemyName == 'BLUE') {
+        this.color = color(0,0,255);
         this.speed = 20;
     }
     else {
@@ -699,10 +751,7 @@ class AStar {
 
             let prevOpenLength = this.openSet.length;
             this.openSet = this.openSet.filter(item => item !== this.currentCell);
-            if (this.openSet.length == prevOpenLength) {
-                debugger;
-            }
-
+            
 
             this.closedSet.push(this.currentCell);
 
@@ -750,7 +799,7 @@ class AStar {
 
 function keyPressed() {
     if (maze && maze.isInitialized) {
-\        player.move(keyCode);
+        player.move(keyCode);
 
         //player.movementDirection = keyCode;
         //player.move(keyCode,true);
