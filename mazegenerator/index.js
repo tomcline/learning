@@ -41,11 +41,10 @@ function setup() {
     
     
     player = new Player(maze,maze.cellSize,maze.cellSize);
-    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'GREEN',player));
-    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'GREY',player));
-    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'YELLOW',player));
-    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'RED',player));
-    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'',player));
+    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'INKY',player));
+    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'BLINKY',player));
+    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'PINKY',player));
+    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'CLYDE',player));
 
 }
 

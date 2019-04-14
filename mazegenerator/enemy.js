@@ -10,30 +10,23 @@ class Enemy extends Player {
     this.type = 'ENEMY';
     this.speed = 0;
 
-
-    if (enemyName == 'RED') {
+    if (enemyName == 'INKY') {
+        this.color = color(0,255,255);
+        this.speed = 40;
+    }
+    else if (enemyName == 'BLINKY') {
         this.color = color(255,0,0);
         this.speed = 60;
     }
-    
-    else if (enemyName == 'GREY') {
-        this.color = color(175,175,175);
+    else if (enemyName == 'PINKY') {
+        this.color = color(255,192,203);
+        this.speed = 30;
+    }
+    else if (enemyName == 'CLYDE') {
+        this.color = color(249,166,2);
         this.speed = 50;
     }
     
-    else if (enemyName == 'GREEN') {
-        this.color = color(0,255,0);
-        this.speed = 40;
-    }
-    
-    else if (enemyName == 'BLUE') {
-        this.color = color(0,0,255);
-        this.speed = 30;
-    }
-    else {
-        this.color = color(255,150,150);
-        this.speed = 20;
-    }
     
 }
 pursue(player,maze,solver) {

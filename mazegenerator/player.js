@@ -88,7 +88,6 @@ class Player extends Cell {
         
         if (frameCount % this.speed == 0) {
             
-            //if (this.isMoving) {
                 let newPosition = this.determineNewPosition(keyCode);
             
                 let canMove = this.canMoveTo(newPosition.i,newPosition.j);
@@ -99,7 +98,6 @@ class Player extends Cell {
                     this.i = this.newPosition.i;
                     this.j = this.newPosition.j;
                 }        
-            //}  
         }
     }
     moveMouth(){
