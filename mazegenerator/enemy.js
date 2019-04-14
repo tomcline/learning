@@ -13,29 +13,33 @@ class Enemy extends Player {
     this.imageIndex = -1;
     this.isScared = false;
     this.isBlinking = false;
-
-    if (enemyName == 'INKY') {
+    this.enemyName = enemyName;
+    
+    this.initializeEnemyType(enemyName);
+    
+    
+}
+initializeEnemyType(enemyName) {
+    if (this.enemyName == 'INKY') {
         this.color = color(0,255,255);
         this.speed = 40;
         this.enemyIndex = 0;
     }
-    else if (enemyName == 'BLINKY') {
+    else if (this.enemyName == 'BLINKY') {
         this.color = color(255,0,0);
         this.speed = 60;
         this.enemyIndex = 1;
     }
-    else if (enemyName == 'PINKY') {
+    else if (this.enemyName == 'PINKY') {
         this.color = color(255,192,203);
         this.speed = 30;
         this.enemyIndex = 2;
     }
-    else if (enemyName == 'CLYDE') {
+    else if (this.enemyName == 'CLYDE') {
         this.color = color(249,166,2);
         this.speed = 50;
         this.enemyIndex = 3;
     }
-    
-    
 }
 switchImage() {
 
