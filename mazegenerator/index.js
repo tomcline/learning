@@ -1,22 +1,16 @@
 
 /////*********    TODO    **************////////////////////
 
-/*
-
-Convert A* to take a grid and solve it in isolation.
-- All solving logic is self contained.
-- Neighbors,etc.
-
-*/ 
 
 
 let maze;
 let enemies = [];
 let player;
 let solver;    
-
+let ghosties_img;
 function preload() {
-    
+    ghosties_img = loadImage('images/ghosts.png');
+
 
 }
 
@@ -30,7 +24,6 @@ function setup() {
 
     createCanvas(winWidth, winHeight);
 
-    //frameRate(60);
 
     solver = new AStar();
 

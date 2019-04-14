@@ -6,13 +6,14 @@ class Cell {
         this.h = h;
         this.color = null;
         this.visited = false;
-        this.type = null;
+        this.type = 'DOT';
         this.fScore = 0;
         this.gScore = 0;
         this.hScore = 0;
         this.previous = null;
         this.neighbors = null;
         this.visitableNeighbors = [];
+        this.maze = maze;
 
         this.walls = [{
                 position: maze.WallPositions.TOP,
@@ -97,43 +98,23 @@ class Cell {
         let h = this.h;
 
 
-
-
-        //Draw visited state;
-        noStroke();
-        // if (this.maze.stack.indexOf(this) > -1){
-        //     fill(0,0,100,100);
-        //     rect(x,y,w,h);
-        // }
-        // else if (this.visited === true) {
-        //     fill(0,255,0,255);
-        //     rect(x,y,w,h);
-        // }
-        // if (this.highlighted) {
-        //     fill(0, 0, 255);
-        //     rect(x, y, w, h);
-        // }
-
-        // if (this.type == "START") {
-        //     fill(0, 255, 0);
-        //     rect(x, y, w, h);
-        // }
-        // else if (this.type == "END") {
-        //     fill(255,0,0);
-        //     rect(x,y,w,h);
-        // }
-
-
-
-
-        // else if (this.color) {
-        //     fill(this.color);
-        //     rect(x, y, w, h);
-        // }
-
         noStroke();
         stroke(255);
         noFill();
+
+        if (this.type == 'DOT') {
+            push();
+            fill(255,255,255);
+            circle((this.i*this.maze.cellSize)+this.maze.cellSize/2,(this.j*this.maze.cellSize)+this.maze.cellSize/2,this.maze.cellSize/12);
+            pop();
+        }
+
+        if (this.type == 'POWERPELLET') {
+            push();
+            fill(255,255,255);
+            circle((this.i*this.maze.cellSize)+this.maze.cellSize/2,(this.j*this.maze.cellSize)+this.maze.cellSize/2,this.maze.cellSize/7);
+            pop();
+        }
 
         //Draw walls
         this.walls.forEach(wall => {

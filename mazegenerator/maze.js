@@ -96,18 +96,6 @@ class Maze {
 
     solveMaze() {
 
-        //No more items in stack to build maze.
-        //Time to solve.
-        
-        // if (this.AStar.openSet.length > 0) {
-        //     console.log("Running Solve");
-        // } else {
-        //     console.log("No solution?");
-        //     //noLoop();
-        //     let cell = this.grid[this.getIndex(this.player.i,this.player.j)];
-        //     this.AStar.openSet.push(cell);
-        //     this.AStar.solve();
-        // }
     }
     
     setStartAndEnd(onlySetEnd) {
