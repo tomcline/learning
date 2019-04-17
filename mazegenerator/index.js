@@ -1,6 +1,10 @@
 
 /////*********    TODO    **************////////////////////
+/*
+Convert to PIXELS for X,Y on cells
 
+
+*/
 
 
 let maze;
@@ -23,7 +27,6 @@ function setup() {
     else if (winHeight > winWidth) winHeight = winWidth;
 
     createCanvas(winWidth, winHeight);
-
 
     solver = new AStar();
 

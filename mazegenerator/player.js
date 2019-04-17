@@ -25,7 +25,7 @@ class Player extends Cell {
         this.isMoving = false;
         this.movementDirection = null;
         this.previousMovementDirection = null;
-        this.speed = 20;
+        this.speed = 1;
         this.newPosition = null;
         this.mouthAngle = 0;
         this.mouthOpening = true;
@@ -63,11 +63,15 @@ class Player extends Cell {
                  newJ = 1;
              }
 
-             return {
-                i: this.i + newI,
-                j: this.j + newJ
-            };
+            //  return {
+            //     i: this.i + newI,
+            //     j: this.j + newJ
+            // };
 
+            return {
+                i: newI,
+                j: newJ
+            };
 
 
     }
@@ -76,7 +80,8 @@ class Player extends Cell {
         let futureCell;
         let currentCell;
 
-        futureCell = maze.getCell(newI, newJ);
+        //(this.i + newPosition.i) * this.speed,(this.j + newPosition.j) * this.speed
+        futureCell = maze.getCell((this.i + newI), (this.j + newJ));
 
         currentCell = maze.getCell(this.i,this.j);
         
@@ -94,8 +99,8 @@ class Player extends Cell {
                 if (canMove){
                     this.isMoving = true;
                     this.newPosition = newPosition;
-                    this.i = this.newPosition.i;
-                    this.j = this.newPosition.j;
+                    this.i += this.newPosition.i * this.speed;
+                    this.j += this.newPosition.j * this.speed;
                 }        
         }
     }
