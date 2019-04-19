@@ -20,6 +20,7 @@ class Player extends Cell {
         
         
         super(i, j, w, h, maze);
+
         this.type = 'PLAYER';
         this.color = color(255, 255, 0);
         this.isMoving = false;
@@ -34,7 +35,7 @@ class Player extends Cell {
     handleKeyPress(keyCode){
          let newPosition = this.determineNewPosition(keyCode);
             
-         let canMove = this.canMoveTo(newPosition.i,newPosition.j);
+         let canMove = this.canMoveTo(this.i+newPosition.i,this.j+newPosition.j);
          if (canMove){
             this.movementDirection = keyCode;
             this.newPosition = newPosition; 
@@ -80,29 +81,59 @@ class Player extends Cell {
         let futureCell;
         let currentCell;
 
-        //(this.i + newPosition.i) * this.speed,(this.j + newPosition.j) * this.speed
-        futureCell = maze.getCell((this.i + newI), (this.j + newJ));
+        let newCellI,newCellJ,currentCellI,currentCellJ;
 
-        currentCell = maze.getCell(this.i,this.j);
+        newCellI = newI;
+        newCellJ = newJ;
+
+        currentCellI = (this.i);
+        currentCellJ = (this.j);
+        //            circle(cell.i * cell.w + cell.w / 2, cell.j * cell.h + cell.h / 2, cell.w / 2);
+
+        futureCell = maze.getCell(newCellI,newCellJ);
+
+        currentCell = maze.getCell(currentCellI,currentCellJ);
         
+
         return currentCell.visitableNeighbors.includes(futureCell);
     }
     move(keyCode) {
      
         
-        if (frameCount % this.speed == 0) {
+        //if (frameCount % this.speed == 0) {
             
                 let newPosition = this.determineNewPosition(keyCode);
-            
-                let canMove = this.canMoveTo(newPosition.i,newPosition.j);
+                                
                 
-                if (canMove){
+                let normalizedI =  Math.floor(Math.abs((-this.w + (2*(this.x+newPosition.i))) / (2 * this.w))) ;
+                let normalizedJ = Math.floor(Math.abs((-this.h + (2*(this.y+ newPosition.j))) / (2 * this.h))) ;
+                
+                
+                
+                let canMove = this.canMoveTo(normalizedI,normalizedJ);
+
+
+                if (canMove || this.isMoving){
                     this.isMoving = true;
+                    
                     this.newPosition = newPosition;
-                    this.i += this.newPosition.i * this.speed;
-                    this.j += this.newPosition.j * this.speed;
-                }        
-        }
+                    
+                    this.i = normalizedI;
+                    this.j = normalizedJ;
+                    
+                    
+                    this.x = this.x + newPosition.i;
+                    this.y = this.y + newPosition.j;
+                    
+                    //}
+    
+                    console.log(normalizedI,this.i,normalizedJ,this.j);
+                    
+                }    
+
+                if (!canMove) {
+                    this.isMoving = false;
+                }
     }
     eat(cell) {
         cell.type = null;
@@ -126,7 +157,6 @@ class Player extends Cell {
     }
 
     show() {
-        let cell = this;
         let rotationAngle = 0;
         //Move mouth twice as fast as movement speed
          if (frameCount % 4 == 0 ){
@@ -157,10 +187,12 @@ class Player extends Cell {
 
 
         if (this.mouthAngle > 0 ) {
-            arc(cell.i * cell.w + cell.w / 2,  cell.j * cell.h + cell.h / 2, cell.w, cell.h, rotationAngle+this.mouthAngle/2, rotationAngle - this.mouthAngle/2, PIE);
+            //* cell.w + cell.w / 2
+            // * cell.h + cell.h / 2
+            arc(this.x,this.y, this.w, this.h, rotationAngle+this.mouthAngle/2, rotationAngle - this.mouthAngle/2, PIE);
         }
         else {
-            circle(cell.i * cell.w + cell.w / 2, cell.j * cell.h + cell.h / 2, cell.w / 2);
+            circle(this.x,this.y, this.w / 2);
         }
 
 

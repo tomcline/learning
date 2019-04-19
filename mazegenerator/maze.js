@@ -7,7 +7,7 @@ class Maze {
         this.AStar = null;
         this.pathSolution = [];
         this.stack = [];
-        this.cellSize = 25;
+        this.cellSize = 24;
         this.currentCell = null;
         this.WallPositions = {
             TOP: 0,
