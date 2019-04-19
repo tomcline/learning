@@ -34,8 +34,9 @@ class Player extends Cell {
     }
     handleKeyPress(keyCode){
          let newPosition = this.determineNewPosition(keyCode);
-            
-         let canMove = this.canMoveTo(this.i+newPosition.i,this.j+newPosition.j);
+         let normalizedPosition = this.normalizePosition(newPosition);
+
+         let canMove = this.canMoveTo(normalizedPosition.i,normalizedPosition.j);
          if (canMove){
             this.movementDirection = keyCode;
             this.newPosition = newPosition; 
@@ -97,6 +98,17 @@ class Player extends Cell {
 
         return currentCell.visitableNeighbors.includes(futureCell);
     }
+    normalizePosition(newPosition) {
+         
+        let normalizedI =  Math.floor(Math.abs((-this.w + (2*(this.x+newPosition.i))) / (2 * this.w))) ;
+        let normalizedJ = Math.floor(Math.abs((-this.h + (2*(this.y+ newPosition.j))) / (2 * this.h))) ;
+        
+        return {
+            i: normalizedI,
+            j:normalizedJ
+        };
+                   
+    }
     move(keyCode) {
      
         
@@ -105,36 +117,33 @@ class Player extends Cell {
                 let newPosition = this.determineNewPosition(keyCode);
                                 
                 
-                let normalizedI =  Math.floor(Math.abs((-this.w + (2*(this.x+newPosition.i))) / (2 * this.w))) ;
-                let normalizedJ = Math.floor(Math.abs((-this.h + (2*(this.y+ newPosition.j))) / (2 * this.h))) ;
+                let normalizedPosition = this.normalizePosition(newPosition);
                 
                 
-                
-                let canMove = this.canMoveTo(normalizedI,normalizedJ);
+                let canMove = this.canMoveTo(normalizedPosition.i,normalizedPosition.j);
 
-
-                if (canMove || this.isMoving){
+                if (canMove){
                     this.isMoving = true;
-                    
+                }   
+                else {
+                    this.isMoving = false;
+                } 
+
+                if (this.isMoving === true) {
+                     
                     this.newPosition = newPosition;
                     
-                    this.i = normalizedI;
-                    this.j = normalizedJ;
+                    this.i = normalizedPosition.i;
+                    this.j = normalizedPosition.j;
                     
                     
                     this.x = this.x + newPosition.i;
                     this.y = this.y + newPosition.j;
-                    
-                    //}
-    
-                    console.log(normalizedI,this.i,normalizedJ,this.j);
-                    
-                }    
-
-                if (!canMove) {
-                    this.isMoving = false;
+                   
                 }
+
     }
+
     eat(cell) {
         cell.type = null;
     }
