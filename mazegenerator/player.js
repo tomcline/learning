@@ -80,50 +80,48 @@ class Player extends Cell {
         let futureCell;
         let currentCell;
 
-
-
-        //futureCell = maze.getCell(newI,newJ);
-
+        futureCell = maze.getCell(this.i+newDirection.i,this.j+newDirection.j);
+        
         currentCell = maze.getCell(this.i,this.j);
-               
-       //left
-        if (newDirection.i == -1) {
-            if (currentCell.walls[this.maze.WallPositions.LEFT].visible == false) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        //right
-        else if (newDirection.i == 1) {
-            if (currentCell.walls[this.maze.WallPositions.RIGHT].visible == false) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        //up
-        else if (newDirection.j == -1) {
-            if (currentCell.walls[this.maze.WallPositions.TOP].visible == false) {
-                return true;
-            }
-        }
-        //down
-        else if (newDirection.j == 1) {
-            if (currentCell.walls[this.maze.WallPositions.BOTTOM].visible == false) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            
-            return false;
-        }
-        //return currentCell.visitableNeighbors.includes(futureCell);
+        
+        return currentCell.visitableNeighbors.includes(futureCell);
+    
+        //    //left
+    //     if (newDirection.i == -1) {
+    //         if (currentCell.walls[this.maze.WallPositions.LEFT].visible == false) {
+    //             return true;
+    //         }
+    //         else {
+    //             return false;
+    //         }
+    //     }
+    //     //right
+    //     else if (newDirection.i == 1) {
+    //         if (currentCell.walls[this.maze.WallPositions.RIGHT].visible == false) {
+    //             return true;
+    //         }
+    //         else {
+    //             return false;
+    //         }
+    //     }
+    //     //up
+    //     else if (newDirection.j == -1) {
+    //         if (currentCell.walls[this.maze.WallPositions.TOP].visible == false) {
+    //             return true;
+    //         }
+    //     }
+    //     //down
+    //     else if (newDirection.j == 1) {
+    //         if (currentCell.walls[this.maze.WallPositions.BOTTOM].visible == false) {
+    //             return true;
+    //         }
+    //         else {
+    //             return false;
+    //         }
+    //     }
+    //     else {
+    //         return false;
+    //     }
     }
     normalizePosition(newDirection) {
          
@@ -131,20 +129,9 @@ class Player extends Cell {
 
         let normalizedJ = Math.round(Math.abs((-this.h + (2*(this.y+ newDirection.j))) / (2 * this.h)));
         
-
-
-        if (newDirection.i < 0 || newDirection.j < 0) {
-        }
-        // if (newDirection.i == 0) {
-        //     normalizedI = this.i;
-        // }
-        // if (newDirection.j == 0) {
-        //     normalizedJ = this.j;
-        // }
-
         return {
             i: normalizedI,
-            j:normalizedJ
+            j: normalizedJ
         };
                    
     }
@@ -154,13 +141,9 @@ class Player extends Cell {
 
 
 
-            //if (frameCount % this.speed == 0) {
                 
                     let newDirection = this.determineNewDirection(keyCode);
                                     
-                    
-                    
-                    
                     let canMove = this.canMoveTo(newDirection);
     
                     if (canMove){
@@ -189,7 +172,6 @@ class Player extends Cell {
                         console.log(this.movementFrames);
                         
                     }
-    
 
         }       
 
