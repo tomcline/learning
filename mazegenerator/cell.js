@@ -4,8 +4,8 @@ class Cell {
         this.j = j;
         this.w = w;
         this.h = h;
-        this.x = Math.floor(i*maze.cellSize+maze.cellSize/2);
-        this.y = Math.floor(j*maze.cellSize+maze.cellSize/2);
+        this.x = Math.round(i*maze.cellSize+maze.cellSize/2);
+        this.y = Math.round(j*maze.cellSize+maze.cellSize/2);
         this.color = null;
         this.visited = false;
         this.type = 'DOT';
@@ -16,6 +16,7 @@ class Cell {
         this.neighbors = null;
         this.visitableNeighbors = [];
         this.maze = maze;
+        this.movementFrames = 0;
 
         this.walls = [{
                 position: maze.WallPositions.TOP,

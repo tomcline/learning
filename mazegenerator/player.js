@@ -27,48 +27,46 @@ class Player extends Cell {
         this.movementDirection = null;
         this.previousMovementDirection = null;
         this.speed = 1;
-        this.newPosition = null;
+        this.newDirection = null;
         this.mouthAngle = 0;
         this.mouthOpening = true;
 
     }
     handleKeyPress(keyCode){
-         let newPosition = this.determineNewPosition(keyCode);
-         let normalizedPosition = this.normalizePosition(newPosition);
 
-         let canMove = this.canMoveTo(normalizedPosition.i,normalizedPosition.j);
+        //this.move(keyCode);
+
+
+         let newDirection = this.determineNewDirection(keyCode);
+        // let normalizedPosition = this.normalizePosition(newDirection);
+         let canMove = this.canMoveTo(newDirection);
          if (canMove){
             this.movementDirection = keyCode;
-            this.newPosition = newPosition; 
+            this.newDirection = newDirection; 
          }
          
     }
-    determineNewPosition(keyCode) {
+    determineNewDirection(keyCode) {
             let newI = 0;
             let newJ = 0;
             
-            if (keyIsDown(LEFT_ARROW) || keyCode == LEFT_ARROW) {
+            if (keyCode == LEFT_ARROW) {
                  newI = -1;    
              }
      
-             if (keyIsDown(RIGHT_ARROW) || keyCode == RIGHT_ARROW) {
+             if (keyCode == RIGHT_ARROW) {
                  newI = 1;
                  
              }
      
-             if (keyIsDown(UP_ARROW) || keyCode == UP_ARROW) {
+             if (keyCode == UP_ARROW) {
                  newJ = -1;
                  
              }
      
-             if (keyIsDown(DOWN_ARROW) || keyCode == DOWN_ARROW) {
+             if (keyCode == DOWN_ARROW) {
                  newJ = 1;
              }
-
-            //  return {
-            //     i: this.i + newI,
-            //     j: this.j + newJ
-            // };
 
             return {
                 i: newI,
@@ -77,32 +75,73 @@ class Player extends Cell {
 
 
     }
-    canMoveTo(newI,newJ) {
+    canMoveTo(newDirection) {
 
         let futureCell;
         let currentCell;
 
-        let newCellI,newCellJ,currentCellI,currentCellJ;
 
-        newCellI = newI;
-        newCellJ = newJ;
 
-        currentCellI = (this.i);
-        currentCellJ = (this.j);
-        //            circle(cell.i * cell.w + cell.w / 2, cell.j * cell.h + cell.h / 2, cell.w / 2);
+        //futureCell = maze.getCell(newI,newJ);
 
-        futureCell = maze.getCell(newCellI,newCellJ);
-
-        currentCell = maze.getCell(currentCellI,currentCellJ);
-        
-
-        return currentCell.visitableNeighbors.includes(futureCell);
+        currentCell = maze.getCell(this.i,this.j);
+               
+       //left
+        if (newDirection.i == -1) {
+            if (currentCell.walls[this.maze.WallPositions.LEFT].visible == false) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        //right
+        else if (newDirection.i == 1) {
+            if (currentCell.walls[this.maze.WallPositions.RIGHT].visible == false) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        //up
+        else if (newDirection.j == -1) {
+            if (currentCell.walls[this.maze.WallPositions.TOP].visible == false) {
+                return true;
+            }
+        }
+        //down
+        else if (newDirection.j == 1) {
+            if (currentCell.walls[this.maze.WallPositions.BOTTOM].visible == false) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            
+            return false;
+        }
+        //return currentCell.visitableNeighbors.includes(futureCell);
     }
-    normalizePosition(newPosition) {
+    normalizePosition(newDirection) {
          
-        let normalizedI =  Math.floor(Math.abs((-this.w + (2*(this.x+newPosition.i))) / (2 * this.w))) ;
-        let normalizedJ = Math.floor(Math.abs((-this.h + (2*(this.y+ newPosition.j))) / (2 * this.h))) ;
+        let normalizedI =  Math.round(Math.abs((-this.w + (2*(this.x+newDirection.i))) / (2 * this.w)));
+
+        let normalizedJ = Math.round(Math.abs((-this.h + (2*(this.y+ newDirection.j))) / (2 * this.h)));
         
+
+
+        if (newDirection.i < 0 || newDirection.j < 0) {
+        }
+        // if (newDirection.i == 0) {
+        //     normalizedI = this.i;
+        // }
+        // if (newDirection.j == 0) {
+        //     normalizedJ = this.j;
+        // }
+
         return {
             i: normalizedI,
             j:normalizedJ
@@ -111,36 +150,48 @@ class Player extends Cell {
     }
     move(keyCode) {
      
-        
-        //if (frameCount % this.speed == 0) {
-            
-                let newPosition = this.determineNewPosition(keyCode);
-                                
-                
-                let normalizedPosition = this.normalizePosition(newPosition);
-                
-                
-                let canMove = this.canMoveTo(normalizedPosition.i,normalizedPosition.j);
+        if (keyCode !== null) {
 
-                if (canMove){
-                    this.isMoving = true;
-                }   
-                else {
-                    this.isMoving = false;
-                } 
 
-                if (this.isMoving === true) {
-                     
-                    this.newPosition = newPosition;
+
+            //if (frameCount % this.speed == 0) {
+                
+                    let newDirection = this.determineNewDirection(keyCode);
+                                    
                     
-                    this.i = normalizedPosition.i;
-                    this.j = normalizedPosition.j;
                     
                     
-                    this.x = this.x + newPosition.i;
-                    this.y = this.y + newPosition.j;
-                   
-                }
+                    let canMove = this.canMoveTo(newDirection);
+    
+                    if (canMove){
+                        this.isMoving = true;
+                    }   
+                    else {
+                        this.isMoving = false;
+                    } 
+    
+                    if (this.isMoving === true) {
+                    
+                        this.newDirection = newDirection;
+                        
+                        this.movementDirection = keyCode;
+                        
+                        if (this.movementFrames == this.maze.cellSize) {
+                            this.i += newDirection.i;
+                            this.j += newDirection.j;    
+                            this.movementFrames = 0;    
+                        }
+                        
+                        this.x += newDirection.i;
+                        this.y += newDirection.j;
+                        this.movementFrames++;
+                        
+                        console.log(this.movementFrames);
+                        
+                    }
+    
+
+        }       
 
     }
 

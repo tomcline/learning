@@ -32,8 +32,8 @@ class Maze {
         maze.buildMaze();
     }
     initialize(width, height) {
-        let cols = floor(width / this.cellSize);
-        let rows = floor(height / this.cellSize);
+        let cols = Math.floor(width / this.cellSize);
+        let rows = Math.floor(height / this.cellSize);
 
         this.grid = [];
 
