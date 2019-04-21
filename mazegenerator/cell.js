@@ -4,8 +4,8 @@ class Cell {
         this.j = j;
         this.w = w;
         this.h = h;
-        this.x = Math.round(i*maze.cellSize+maze.cellSize/2);
-        this.y = Math.round(j*maze.cellSize+maze.cellSize/2);
+        this.x = Math.round(i * maze.cellSize + maze.cellSize / 2);
+        this.y = Math.round(j * maze.cellSize + maze.cellSize / 2);
         this.color = null;
         this.visited = false;
         this.type = 'DOT';
@@ -16,7 +16,7 @@ class Cell {
         this.neighbors = null;
         this.visitableNeighbors = [];
         this.maze = maze;
-        this.movementFrames = 0;
+        this.movementFrame = 0;
 
         this.walls = [{
                 position: maze.WallPositions.TOP,
@@ -49,8 +49,8 @@ class Cell {
         ];
 
     }
-    
-    reset(){
+
+    reset() {
         this.fScore = 0;
         this.gScore = 0;
         this.hScore = 0;
@@ -66,12 +66,12 @@ class Cell {
         this.neighbors = neighbors.filter(index => (index !== undefined && index !== null));
 
     }
-    
+
     checkNeighbors() {
         let notVisitedNeighbors = [];
         if (this.neighbors == null) this.addNeighbors();
 
-        
+
 
         this.neighbors.forEach(neighbor => {
             if (neighbor.visited === false) {
@@ -80,11 +80,11 @@ class Cell {
         });
 
         if (notVisitedNeighbors.length > 0) {
-            
+
 
 
             let rando = floor(random(0, notVisitedNeighbors.length));
-            
+
             return notVisitedNeighbors[rando];
         } else {
             return undefined;
@@ -107,15 +107,15 @@ class Cell {
 
         if (this.type == 'DOT') {
             push();
-            fill(255,255,255);
-            circle((this.i*this.maze.cellSize)+this.maze.cellSize/2,(this.j*this.maze.cellSize)+this.maze.cellSize/2,this.maze.cellSize/12);
+            fill(255, 255, 255);
+            circle((this.i * this.maze.cellSize) + this.maze.cellSize / 2, (this.j * this.maze.cellSize) + this.maze.cellSize / 2, this.maze.cellSize / 12);
             pop();
         }
 
         if (this.type == 'POWERPELLET') {
             push();
-            fill(255,255,255);
-            circle((this.i*this.maze.cellSize)+this.maze.cellSize/2,(this.j*this.maze.cellSize)+this.maze.cellSize/2,this.maze.cellSize/7);
+            fill(255, 255, 255);
+            circle((this.i * this.maze.cellSize) + this.maze.cellSize / 2, (this.j * this.maze.cellSize) + this.maze.cellSize / 2, this.maze.cellSize / 7);
             pop();
         }
 
