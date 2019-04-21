@@ -4,8 +4,8 @@ class Cell {
         this.j = j;
         this.w = w;
         this.h = h;
-        this.x = Math.round(i * maze.cellSize + maze.cellSize / 2);
-        this.y = Math.round(j * maze.cellSize + maze.cellSize / 2);
+        this.x = (i * maze.cellSize) + (maze.cellSize / 2);
+        this.y = (j * maze.cellSize) + (maze.cellSize / 2);
         this.color = null;
         this.visited = false;
         this.type = 'DOT';
@@ -111,14 +111,16 @@ class Cell {
             circle((this.i * this.maze.cellSize) + this.maze.cellSize / 2, (this.j * this.maze.cellSize) + this.maze.cellSize / 2, this.maze.cellSize / 12);
             pop();
         }
-
+        
         if (this.type == 'POWERPELLET') {
             push();
             fill(255, 255, 255);
             circle((this.i * this.maze.cellSize) + this.maze.cellSize / 2, (this.j * this.maze.cellSize) + this.maze.cellSize / 2, this.maze.cellSize / 7);
             pop();
         }
-
+        
+        textSize(7);
+        text(this.i + "," + this.j,this.x-5,this.y-5);
         //Draw walls
         this.walls.forEach(wall => {
             if (wall.visible === true) {

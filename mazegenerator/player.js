@@ -35,11 +35,9 @@ class Player extends Cell {
 
         
         let newDirection = this.determineNewDirection(keyCode);
-        // let normalizedPosition = this.normalizePosition(newDirection);
-       
-        if (this.movementDirection != keyCode) {
+        if (this.movementDirection != keyCode && this.isInMiddleOfCell()) {
             let canMove = this.canMoveTo(newDirection);
-            if (canMove) {
+            if (canMove) {         
                     this.movementDirection = keyCode;
                     this.newDirection = newDirection;                
             }
@@ -84,8 +82,10 @@ class Player extends Cell {
         futureCell = maze.getCell(this.i + newDirection.i, this.j + newDirection.j);
 
         currentCell = maze.getCell(this.i, this.j);
-
+        
         return currentCell.visitableNeighbors.includes(futureCell);
+            
+        
 
         //    //left
         //     if (newDirection.i == -1) {
@@ -125,6 +125,9 @@ class Player extends Cell {
         //     }
     }
     normalizePosition(newDirection) {
+        if (newDirection == null || newDirection == undefined) {
+            newDirection = {i:0,j:0};
+        }
 
         let normalizedI = Math.round(Math.abs((-this.w + (2 * (this.x + newDirection.i))) / (2 * this.w)));
 
@@ -135,6 +138,9 @@ class Player extends Cell {
             j: normalizedJ
         };
 
+    }
+    isInMiddleOfCell(){
+        return (this.x % this.w == this.w/2 && this.y % this.h == this.h/2);
     }
     move(keyCode) {
 
@@ -151,16 +157,23 @@ class Player extends Cell {
             }
 
             if (this.isMoving === true) {
-                this.newDirection = newDirection;
 
+                this.newDirection = newDirection;
                 this.movementDirection = keyCode;
                 
                 if (newDirection.i != 0 || newDirection.j != 0) {
                     this.x += newDirection.i;
                     this.y += newDirection.j;
-                    if (this.x % this.w == this.w/2 && this.y % this.h == this.h/2) {
+                    if (this.isInMiddleOfCell()) {
                         this.i += newDirection.i;
                         this.j += newDirection.j;
+                        
+                        //this.x = (this.i*this.w) + (this.w/2);
+                        //this.y = (this.j*this.h) + (this.h/2);
+                        
+                        //let normalizedPosition = this.normalizePosition(newDirection);
+                        //this.i = normalizedPosition.i;
+                        //this.j = normalizedPosition.j;
                     }
                 }
                 
@@ -228,6 +241,8 @@ class Player extends Cell {
         } else {
             circle(this.x, this.y, this.w / 2);
         }
+        
+        text(this.i + "," + this.j,this.x+10,this.y+10);
 
 
         let mazeCell = this.maze.getCell(this.i, this.j);
