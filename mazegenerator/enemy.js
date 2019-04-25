@@ -74,15 +74,17 @@ move(newI,newJ){
             this.j = newJ;
         }
         
-        if (frameCount % 15 == 0) {
-            this.switchImage();
-        }
+        
 
     }
     show(){
 
-        push();
+        if (frameCount % 15 == 0) {
+            this.switchImage();
+        }
 
+        push();
+        //Thanks to human on the interwebz for building the enemy sprite.
         var ghostIndex = this.isScared ? 4 : this.enemyIndex; // the vert ghost image
         var imageIndex = this.isBlinking ? 2 : this.imageIndex; // horiz image
 

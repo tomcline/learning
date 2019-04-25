@@ -6,7 +6,7 @@ class Cell {
         this.h = h;
         this.x = (i * maze.cellSize) + (maze.cellSize / 2);
         this.y = (j * maze.cellSize) + (maze.cellSize / 2);
-        this.color = null;
+        this.color = color(255,255,255);
         this.visited = false;
         this.type = 'DOT';
         this.fScore = 0;
@@ -17,6 +17,7 @@ class Cell {
         this.visitableNeighbors = [];
         this.maze = maze;
         this.movementFrame = 0;
+        this.debug = false;
 
         this.walls = [{
                 position: maze.WallPositions.TOP,
@@ -94,6 +95,25 @@ class Cell {
     highlight(highlight) {
         this.highlighted = highlight;
     }
+    getDebugString() {
+        return this.i + "," + this.j;
+    }
+    getDebugPosition() {
+        return {
+            x: this.x - 5,
+            y: this.y - 5
+        }
+    }
+    drawDebugInfo() {
+        push();
+        //if (this.type == "PLAYER") debugger;
+        fill(this.color.levels);
+        noStroke();
+        textSize(7);
+        let position = this.getDebugPosition();
+        text(this.getDebugString(), position.x, position.y);
+        pop();
+    }
     show() {
         let x = this.i * maze.cellSize;
         let y = this.j * maze.cellSize;
@@ -111,16 +131,14 @@ class Cell {
             circle((this.i * this.maze.cellSize) + this.maze.cellSize / 2, (this.j * this.maze.cellSize) + this.maze.cellSize / 2, this.maze.cellSize / 12);
             pop();
         }
-        
+
         if (this.type == 'POWERPELLET') {
             push();
             fill(255, 255, 255);
             circle((this.i * this.maze.cellSize) + this.maze.cellSize / 2, (this.j * this.maze.cellSize) + this.maze.cellSize / 2, this.maze.cellSize / 7);
             pop();
         }
-        
-        textSize(7);
-        text(this.i + "," + this.j,this.x-5,this.y-5);
+
         //Draw walls
         this.walls.forEach(wall => {
             if (wall.visible === true) {

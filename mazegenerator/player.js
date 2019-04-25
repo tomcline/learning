@@ -8,7 +8,6 @@ class Player extends Cell {
 
         function determinePosition() {
             tempCell = maze.grid[floor(random(maze.grid.length - 1))];
-            if (tempCell === maze.start || tempCell === maze.end) {}
             return tempCell;
         }
 
@@ -33,16 +32,18 @@ class Player extends Cell {
     }
     handleKeyPress(keyCode) {
 
-        
+
         let newDirection = this.determineNewDirection(keyCode);
-        if (this.movementDirection != keyCode && this.isInMiddleOfCell()) {
-            let canMove = this.canMoveTo(newDirection);
-            if (canMove) {         
-                    this.movementDirection = keyCode;
-                    this.newDirection = newDirection;                
+        //&& this.isInMiddleOfCell()
+        if (this.movementDirection != keyCode ) {
+            let canMove = this.canMoveTo(this.getNewPosition(newDirection));
+            if (canMove) {
+                //this.move(keyCode);
+                this.movementDirection = keyCode;
+                this.newDirection = newDirection;
             }
         }
-       
+
 
     }
     determineNewDirection(keyCode) {
@@ -74,64 +75,30 @@ class Player extends Cell {
 
 
     }
-    canMoveTo(newDirection) {
+    getNewPosition(newDirection){
+        return this.maze.getCell(this.i + newDirection.i, this.j + newDirection.j);
+    }
+    canMoveTo(newPosition) {
 
-        let futureCell;
         let currentCell;
 
-        futureCell = maze.getCell(this.i + newDirection.i, this.j + newDirection.j);
+        currentCell = this.maze.getCell(this.i, this.j);
+        return currentCell.visitableNeighbors.includes(newPosition);
 
-        currentCell = maze.getCell(this.i, this.j);
-        
-        return currentCell.visitableNeighbors.includes(futureCell);
-            
-        
-
-        //    //left
-        //     if (newDirection.i == -1) {
-        //         if (currentCell.walls[this.maze.WallPositions.LEFT].visible == false) {
-        //             return true;
-        //         }
-        //         else {
-        //             return false;
-        //         }
-        //     }
-        //     //right
-        //     else if (newDirection.i == 1) {
-        //         if (currentCell.walls[this.maze.WallPositions.RIGHT].visible == false) {
-        //             return true;
-        //         }
-        //         else {
-        //             return false;
-        //         }
-        //     }
-        //     //up
-        //     else if (newDirection.j == -1) {
-        //         if (currentCell.walls[this.maze.WallPositions.TOP].visible == false) {
-        //             return true;
-        //         }
-        //     }
-        //     //down
-        //     else if (newDirection.j == 1) {
-        //         if (currentCell.walls[this.maze.WallPositions.BOTTOM].visible == false) {
-        //             return true;
-        //         }
-        //         else {
-        //             return false;
-        //         }
-        //     }
-        //     else {
-        //         return false;
-        //     }
     }
     normalizePosition(newDirection) {
         if (newDirection == null || newDirection == undefined) {
-            newDirection = {i:0,j:0};
+            newDirection = {
+                i: 0,
+                j: 0
+            };
         }
 
-        let normalizedI = Math.round(Math.abs((-this.w + (2 * (this.x + newDirection.i))) / (2 * this.w)));
+        let normalizedI = this.x % this.w;
+        //Math.round(Math.abs((-this.w + (2 * (this.x + newDirection.i))) / (2 * this.w)));
 
-        let normalizedJ = Math.round(Math.abs((-this.h + (2 * (this.y + newDirection.j))) / (2 * this.h)));
+        let normalizedJ = this.y % this.h;
+        //Math.round(Math.abs((-this.h + (2 * (this.y + newDirection.j))) / (2 * this.h)));
 
         return {
             i: normalizedI,
@@ -139,8 +106,8 @@ class Player extends Cell {
         };
 
     }
-    isInMiddleOfCell(){
-        return (this.x % this.w == this.w/2 && this.y % this.h == this.h/2);
+    isInMiddleOfCell() {
+        return (this.x % this.w == this.w / 2 && this.y % this.h == this.h / 2);
     }
     move(keyCode) {
 
@@ -148,7 +115,7 @@ class Player extends Cell {
 
             let newDirection = this.determineNewDirection(keyCode);
 
-            let canMove = this.canMoveTo(newDirection);
+            let canMove = this.canMoveTo(this.getNewPosition(newDirection));
 
             if (canMove) {
                 this.isMoving = true;
@@ -160,26 +127,20 @@ class Player extends Cell {
 
                 this.newDirection = newDirection;
                 this.movementDirection = keyCode;
-                
+
                 if (newDirection.i != 0 || newDirection.j != 0) {
                     this.x += newDirection.i;
                     this.y += newDirection.j;
+
                     if (this.isInMiddleOfCell()) {
                         this.i += newDirection.i;
                         this.j += newDirection.j;
-                        
-                        //this.x = (this.i*this.w) + (this.w/2);
-                        //this.y = (this.j*this.h) + (this.h/2);
-                        
-                        //let normalizedPosition = this.normalizePosition(newDirection);
-                        //this.i = normalizedPosition.i;
-                        //this.j = normalizedPosition.j;
                     }
                 }
-                
 
-                
-            
+
+
+
             }
         }
 
@@ -204,16 +165,18 @@ class Player extends Cell {
 
     }
 
-    show() {
-        let rotationAngle = 0;
-        //Move mouth twice as fast as movement speed
-        if (frameCount % 4 == 0) {
-            this.moveMouth();
-        }
+    getDebugString() {
+        return this.i + "," + this.j + " || " + this.x + "," + this.y;
+    }
 
-        noStroke();
-        fill(this.color);
-        angleMode(DEGREES);
+    getDebugPosition() {
+        return {
+            x: this.x - this.w,
+            y: this.y + 20
+        };
+    }
+    determineRotationAngle(){
+        let rotationAngle = 0;
         switch (this.movementDirection) {
             case LEFT_ARROW:
                 rotationAngle = 180;
@@ -227,22 +190,33 @@ class Player extends Cell {
             case DOWN_ARROW:
                 rotationAngle = 90;
                 break;
-
+    
             default:
                 break;
         }
+        return rotationAngle;
+    }
+    show() {
+
+        let rotationAngle = this.determineRotationAngle();
+
+        //Chomp Chomp!
+        if (frameCount % 4 == 0) {
+            this.moveMouth();
+        }
+
+        noStroke();
+        fill(this.color);
+        angleMode(DEGREES);
 
 
 
         if (this.mouthAngle > 0) {
-            //* cell.w + cell.w / 2
-            // * cell.h + cell.h / 2
             arc(this.x, this.y, this.w, this.h, rotationAngle + this.mouthAngle / 2, rotationAngle - this.mouthAngle / 2, PIE);
         } else {
             circle(this.x, this.y, this.w / 2);
         }
-        
-        text(this.i + "," + this.j,this.x+10,this.y+10);
+
 
 
         let mazeCell = this.maze.getCell(this.i, this.j);

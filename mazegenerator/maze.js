@@ -134,13 +134,12 @@ class Maze {
         this.end = this.grid[this.getIndex(i, j)];
     }
     prepareMazeToSolve() {
+
         this.setStartAndEnd();
 
-
-        this.AStar = new AStar(this.start,this.end, color(255, 0, 0,200));
+        //this.AStar = new AStar(this.start,this.end, color(255, 0, 0,200));
 
         this.isInitialized = true;
-
 
     }
     

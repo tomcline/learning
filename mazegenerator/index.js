@@ -2,8 +2,7 @@
 /////*********    TODO    **************////////////////////
 /*
 Convert to PIXELS for X,Y on cells
-
-
+Player and enemy really don't need to extend cell
 */
 
 
@@ -42,8 +41,18 @@ function setup() {
     enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'PINKY',player));
     enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'CLYDE',player));
 
+
+
+
 }
 
+function drawDebugInfo(){
+    player.drawDebugInfo();
+
+    maze.grid.forEach(cell => {
+        cell.drawDebugInfo();
+    });
+}
 
 function draw() {
         
@@ -59,6 +68,8 @@ function draw() {
             enemy.pursue(player,maze,solver);
             enemy.show();
         });
+
+        drawDebugInfo();
 
 
 }
