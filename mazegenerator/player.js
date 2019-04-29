@@ -6,12 +6,12 @@ class Player extends Cell {
         h = height;
         w = width;
 
-        function determinePosition() {
+        function determineStartPosition() {
             tempCell = maze.grid[floor(random(maze.grid.length - 1))];
             return tempCell;
         }
 
-        tempCell = determinePosition();
+        tempCell = determineStartPosition();
 
         i = tempCell.i;
         j = tempCell.j;
@@ -22,10 +22,9 @@ class Player extends Cell {
         this.type = 'PLAYER';
         this.color = color(255, 255, 0);
         this.isMoving = false;
-        this.movementDirection = null;
-        this.previousMovementDirection = null;
+        this.desiredMovementDirection = null;
+        this.currentMovementDirection = null;
         this.speed = 1;
-        this.newDirection = null;
         this.mouthAngle = 0;
         this.mouthOpening = true;
 
@@ -33,50 +32,74 @@ class Player extends Cell {
     handleKeyPress(keyCode) {
 
 
-        let newDirection = this.determineNewDirection(keyCode);
+        //let newDirection = this.determineNewDirection(keyCode);
         //&& this.isInMiddleOfCell()
-        if (this.movementDirection != keyCode ) {
-            let canMove = this.canMoveTo(this.getNewPosition(newDirection));
-            if (canMove) {
-                //this.move(keyCode);
-                this.movementDirection = keyCode;
-                this.newDirection = newDirection;
-            }
+        if (this.currentMovementDirection != keyCode) {
+            //let canMove = this.canMoveTo(this.getNewPosition(newDirection));
+            //if (canMove) {
+            //this.move(keyCode);
+            this.willChangeDirection = this.isChangingDirection(keyCode);
+            this.desiredMovementDirection = keyCode;
+            //this.newDirection = newDirection;
+            //}
         }
+
+
+    }
+    isChangingDirection(desiredDirection){
+        //if (this.currentMovementDirection != null && this.desiredMovementDirection != null) {
+            
+            let currentPos =   this.determineNewDirection(this.currentMovementDirection);
+            let desiredPos = this.determineNewDirection(desiredDirection);
+
+            if (  (this.currentMovementDirection == LEFT_ARROW || this.currentMovementDirection == RIGHT_ARROW) && (desiredDirection == UP_ARROW || desiredDirection == DOWN_ARROW) ){
+                return true;
+            }
+            else if ((this.currentMovementDirection == UP_ARROW || this.currentMovementDirection == DOWN_ARROW) && (desiredDirection == LEFT_ARROW || desiredDirection == RIGHT_ARROW) ) {
+                return true;
+            }
+            else {
+                return false;
+            }
+
+        //}
+        //let difference = createVector(currentPos.x,currentPos.y).sub(createVector(desiredPos.x,desiredPos.y));
+        //console.log(difference);
+        //this.desiredMovementDirection
 
 
     }
     determineNewDirection(keyCode) {
-        let newI = 0;
-        let newJ = 0;
+        let newX = 0;
+        let newY = 0;
 
         if (keyCode == LEFT_ARROW) {
-            newI = -1;
+            newX = -1;
         }
 
         if (keyCode == RIGHT_ARROW) {
-            newI = 1;
+            newX = 1;
 
         }
 
         if (keyCode == UP_ARROW) {
-            newJ = -1;
+            newY = -1;
 
         }
 
         if (keyCode == DOWN_ARROW) {
-            newJ = 1;
+            newY = 1;
         }
 
         return {
-            i: newI,
-            j: newJ
+            x: newX,
+            y: newY
         };
 
 
     }
-    getNewPosition(newDirection){
-        return this.maze.getCell(this.i + newDirection.i, this.j + newDirection.j);
+    getNewPosition(newDirection) {
+        return this.maze.getCell(this.i + newDirection.x, this.j + newDirection.y);
     }
     canMoveTo(newPosition) {
 
@@ -86,19 +109,13 @@ class Player extends Cell {
         return currentCell.visitableNeighbors.includes(newPosition);
 
     }
-    normalizePosition(newDirection) {
-        if (newDirection == null || newDirection == undefined) {
-            newDirection = {
-                i: 0,
-                j: 0
-            };
-        }
+    normalizePosition() {
+       
 
-        let normalizedI = this.x % this.w;
-        //Math.round(Math.abs((-this.w + (2 * (this.x + newDirection.i))) / (2 * this.w)));
-
-        let normalizedJ = this.y % this.h;
-        //Math.round(Math.abs((-this.h + (2 * (this.y + newDirection.j))) / (2 * this.h)));
+        let normalizedI = Math.round(Math.abs((-this.w + (2 * this.x)) / (2 * this.w)));        ;
+        
+        let normalizedJ = Math.round(Math.abs((-this.h + (2 * this.y)) / (2 * this.h)));
+        
 
         return {
             i: normalizedI,
@@ -109,45 +126,65 @@ class Player extends Cell {
     isInMiddleOfCell() {
         return (this.x % this.w == this.w / 2 && this.y % this.h == this.h / 2);
     }
-    move(keyCode) {
-
-        if (keyCode !== null) {
-
-            let newDirection = this.determineNewDirection(keyCode);
-
-            let canMove = this.canMoveTo(this.getNewPosition(newDirection));
-
-            if (canMove) {
-                this.isMoving = true;
-            } else {
-                this.isMoving = false;
-            }
-
-            if (this.isMoving === true) {
-
-                this.newDirection = newDirection;
-                this.movementDirection = keyCode;
-
-                if (newDirection.i != 0 || newDirection.j != 0) {
-                    this.x += newDirection.i;
-                    this.y += newDirection.j;
-
+    moveInDirection(direction, forceMove){
+        let directionPosition = this.determineNewDirection(direction);
+        let canMoveInDirection = this.canMoveTo(this.getNewPosition(directionPosition));
+            if (canMoveInDirection || forceMove ) {
+                if (this.isChangingDirection) {
                     if (this.isInMiddleOfCell()) {
-                        this.i += newDirection.i;
-                        this.j += newDirection.j;
+                        this.x += directionPosition.x;
+                        this.y += directionPosition.y;
+                        return true;
                     }
+                    else {
+                        this.x += directionPosition.x;
+                        this.y += directionPosition.y;
+                        return true;
+                    }
+      
+                }
+                else {
+                    this.x += directionPosition.x;
+                    this.y += directionPosition.y;
+                    return true;
                 }
 
-
-
-
+                
             }
+            return false;
         }
+        move() {
+            let didMove = false;
+            let isInMiddleOfCell = this.isInMiddleOfCell();
+            if (this.desiredMovementDirection !== null) {
 
-    }
-
-    eat(cell) {
-        cell.type = null;
+                didMove = this.moveInDirection(this.desiredMovementDirection);
+               
+                if (didMove === true) {
+                    this.currentMovementDirection = this.desiredMovementDirection;
+                    this.desiredMovementDirection = null;
+                }
+                else {
+                   didMove = this.moveInDirection(this.currentMovementDirection);
+                }
+                
+            } else if (this.currentMovementDirection !== null) {
+                didMove = this.moveInDirection(this.currentMovementDirection);
+            }
+            
+            let normalizedPosition = this.normalizePosition();
+            this.i = normalizedPosition.i;
+            this.j = normalizedPosition.j;
+            
+            if (!didMove && !isInMiddleOfCell) {
+                this.moveInDirection(this.currentMovementDirection, true);
+            }
+            
+            
+        }
+        
+        eat(cell) {
+            cell.type = null;
     }
     moveMouth() {
 
@@ -175,9 +212,9 @@ class Player extends Cell {
             y: this.y + 20
         };
     }
-    determineRotationAngle(){
+    determineRotationAngle() {
         let rotationAngle = 0;
-        switch (this.movementDirection) {
+        switch (this.currentMovementDirection) {
             case LEFT_ARROW:
                 rotationAngle = 180;
                 break;
@@ -190,7 +227,7 @@ class Player extends Cell {
             case DOWN_ARROW:
                 rotationAngle = 90;
                 break;
-    
+
             default:
                 break;
         }

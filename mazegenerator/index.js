@@ -3,6 +3,7 @@
 /*
 Convert to PIXELS for X,Y on cells
 Player and enemy really don't need to extend cell
+Switch calculations to async?
 */
 
 
@@ -11,10 +12,18 @@ let enemies = [];
 let player;
 let solver;    
 let ghosties_img;
+
+
+//P5 js key handler.
+function keyPressed() {
+    if (maze && maze.isInitialized) {
+       player.handleKeyPress(keyCode);
+    }
+}
+
+
 function preload() {
     ghosties_img = loadImage('images/ghosts.png');
-
-
 }
 
 function setup() {
@@ -60,7 +69,7 @@ function draw() {
     
         maze.draw();    
 
-        player.move(player.movementDirection);
+        player.move();
         
         player.show();      
         
@@ -74,10 +83,3 @@ function draw() {
 
 }
 
-
-function keyPressed() {
-    if (maze && maze.isInitialized) {
-       player.handleKeyPress(keyCode);
-    }
-
-}
