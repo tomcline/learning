@@ -135,7 +135,7 @@ class Maze {
     }
     prepareMazeToSolve() {
 
-        this.setStartAndEnd();
+        //this.setStartAndEnd();
 
         //this.AStar = new AStar(this.start,this.end, color(255, 0, 0,200));
 

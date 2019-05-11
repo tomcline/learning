@@ -172,8 +172,10 @@ class Player extends Cell {
             }
         }
 
-        let normalizedPosition = this.normalizePosition();
 
+
+        //Update i and j position.
+        let normalizedPosition = this.normalizePosition();
         this.i = normalizedPosition.i;
         this.j = normalizedPosition.j;
 
