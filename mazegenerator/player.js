@@ -105,6 +105,7 @@ class Player extends Cell {
 
         currentCell = this.maze.getCell(this.i, this.j);
         return currentCell.visitableNeighbors.includes(newPosition);
+    
 
     }
     normalizePosition() {
@@ -211,7 +212,7 @@ class Player extends Cell {
     getDebugPosition() {
         return {
             x: this.x - this.w,
-            y: this.y + 20
+            y: this.y + 30
         };
     }
     determineRotationAngle() {

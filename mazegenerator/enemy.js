@@ -60,21 +60,77 @@ pursue(player,maze,solver) {
 
     let newPosition = solver.pathSolution[solver.pathSolution.length-2];
     if (newPosition) {
-        this.move(newPosition.i,newPosition.j);
+        this.calculateDirection(newPosition.i,newPosition.j);
+        //this.move(newPosition.i,newPosition.j);
     }
+    
+    this.move();
    
     solver.reset();
 
 }
+/*
 move(newI,newJ){
         
         if (frameCount % this.speed == 0) {
-            
-            this.i = newI;
-            this.j = newJ;
+            //this.i = newI;
+            //this.j = newJ;
+            //Update i and j position.
+            let normalizedPosition = this.normalizePosition();
+            this.i = normalizedPosition.i;
+            this.j = normalizedPosition.j;
         }
         
         
+
+    }
+    */
+    calculateDirection(newI,newJ){
+            
+                var directionI = newI - this.i;
+                var directionJ = newJ - this.j;
+                var keyCode = this.desiredMovementDirection;
+                
+                if (directionI != 0) {
+                    switch (directionI) {
+                        case -1:
+                            keyCode = LEFT_ARROW;
+                            break;
+                        case 1:
+                            keyCode = RIGHT_ARROW;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (directionJ != 0) {
+                    switch (directionJ) {
+                        case -1:
+                            keyCode = UP_ARROW;
+                            break;
+                        case 1:
+                            keyCode = DOWN_ARROW;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+
+                //let newDirection = this.determineNewDirection(keyCode);
+                //&& this.isInMiddleOfCell()
+                if (this.currentMovementDirection != keyCode) {
+                    //let canMove = this.canMoveTo(this.getNewPosition(newDirection));
+                    //if (canMove) {
+                    //this.move(keyCode);
+                    this.willChangeDirection = this.isChangingDirection(keyCode);
+                    this.desiredMovementDirection = keyCode;
+                    //this.newDirection = newDirection;
+                    //}
+                }
+
+
 
     }
     show(){
@@ -89,7 +145,9 @@ move(newI,newJ){
         var imageIndex = this.isBlinking ? 2 : this.imageIndex; // horiz image
 
       
-        image(ghosties_img, this.i*maze.cellSize, this.j*maze.cellSize, this.w, this.h, (42 * imageIndex), 43 * ghostIndex, 45, 45);
+        //image(ghosties_img, this.i*maze.cellSize, this.j*maze.cellSize, this.w, this.h, (42 * imageIndex), 43 * ghostIndex, 45, 45);
+        image(ghosties_img, this.x-this.w/2, this.y-this.h/2, this.w, this.h, (42 * imageIndex), 43 * ghostIndex, 45, 45);
+
         pop();
 
   

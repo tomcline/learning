@@ -3,7 +3,8 @@
 /*
 Convert to PIXELS for X,Y on cells
 Player and enemy really don't need to extend cell
-Switch calculations to async?
+Switch calculations to async or webworker?
+Sound
 */
 
 
@@ -60,6 +61,10 @@ function drawDebugInfo(){
 
     maze.grid.forEach(cell => {
         cell.drawDebugInfo();
+    });
+
+    enemies.forEach(enemy => {
+        enemy.drawDebugInfo();
     });
 }
 
