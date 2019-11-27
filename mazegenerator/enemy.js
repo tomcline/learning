@@ -22,22 +22,22 @@ class Enemy extends Player {
 initializeEnemyType(enemyName) {
     if (this.enemyName == 'INKY') {
         this.color = color(0,255,255);
-        this.speed = 40;
+        this.speed = 1;
         this.enemyIndex = 0;
     }
     else if (this.enemyName == 'BLINKY') {
         this.color = color(255,0,0);
-        this.speed = 60;
+        this.speed = 3;
         this.enemyIndex = 1;
     }
     else if (this.enemyName == 'PINKY') {
         this.color = color(255,192,203);
-        this.speed = 30;
+        this.speed = 5;
         this.enemyIndex = 2;
     }
     else if (this.enemyName == 'CLYDE') {
         this.color = color(249,166,2);
-        this.speed = 50;
+        this.speed = 7;
         this.enemyIndex = 3;
     }
 }
@@ -57,14 +57,18 @@ pursue(player,maze,solver) {
     
     solver.generateSolutionPath();
     solver.drawPathSolution(this.color);
-
-    let newPosition = solver.pathSolution[solver.pathSolution.length-2];
-    if (newPosition) {
-        this.calculateDirection(newPosition.i,newPosition.j);
-        //this.move(newPosition.i,newPosition.j);
-    }
     
-    this.move();
+    console.log(this.enemyName + " " + frameCount % this.speed);
+    if (frameCount % this.speed == 0) {
+
+        let newPosition = solver.pathSolution[solver.pathSolution.length-2];
+        if (newPosition) {
+            this.move(newPosition.i,newPosition.j);
+        }
+        else {
+            this.move(this.i,this.j);
+        }
+    }
    
     solver.reset();
 
@@ -85,50 +89,60 @@ move(newI,newJ){
 
     }
     */
-    calculateDirection(newI,newJ){
+    move(newI,newJ){
             
                 var directionI = newI - this.i;
                 var directionJ = newJ - this.j;
-                var keyCode = this.desiredMovementDirection;
+                var directionPosition = {
+                    x: directionI,
+                    y: directionJ
+                };
+
+                if (this.isInMiddleOfCell()) {
+                    this.x += directionPosition.x;
+                    this.y += directionPosition.y;
+                    this.previousMovement = directionPosition;
+                }
+                else {
+                    this.x += this.previousMovement.x;
+                    this.y += this.previousMovement.y;
+                }
+
+                //Update i and j position.
+                let normalizedPosition = this.normalizePosition();
+                this.i = normalizedPosition.i;
+                this.j = normalizedPosition.j;
+
                 
-                if (directionI != 0) {
-                    switch (directionI) {
-                        case -1:
-                            keyCode = LEFT_ARROW;
-                            break;
-                        case 1:
-                            keyCode = RIGHT_ARROW;
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                // var keyCode = this.desiredMovementDirection;
+                // if (directionI != 0) {
+                //     switch (directionI) {
+                //         case -1:
+                //             keyCode = LEFT_ARROW;
+                //             break;
+                //         case 1:
+                //             keyCode = RIGHT_ARROW;
+                //             break;
+                //         default:
+                //             break;
+                //     }
+                // }
 
-                if (directionJ != 0) {
-                    switch (directionJ) {
-                        case -1:
-                            keyCode = UP_ARROW;
-                            break;
-                        case 1:
-                            keyCode = DOWN_ARROW;
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                // if (directionJ != 0) {
+                //     switch (directionJ) {
+                //         case -1:
+                //             keyCode = UP_ARROW;
+                //             break;
+                //         case 1:
+                //             keyCode = DOWN_ARROW;
+                //             break;
+                //         default:
+                //             break;
+                //     }
+                // }
 
 
-                //let newDirection = this.determineNewDirection(keyCode);
-                //&& this.isInMiddleOfCell()
-                if (this.currentMovementDirection != keyCode) {
-                    //let canMove = this.canMoveTo(this.getNewPosition(newDirection));
-                    //if (canMove) {
-                    //this.move(keyCode);
-                    this.willChangeDirection = this.isChangingDirection(keyCode);
-                    this.desiredMovementDirection = keyCode;
-                    //this.newDirection = newDirection;
-                    //}
-                }
+                // this.handleKeyPress(keyCode);
 
 
 
