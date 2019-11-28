@@ -1,11 +1,8 @@
 
-/////*********    TODO    **************////////////////////
-/*
-Convert to PIXELS for X,Y on cells
-Player and enemy really don't need to extend cell
-Switch calculations to async or webworker?
-Sound
-*/
+// TODO Player enemy collisions
+// TODO New map generation? https://github.com/shaunlebron/pacman-mazegen
+// TODO Implement personalities into enemy movement...
+// FIXME Player warps through walls and gets out of syncp5.BandPass()
 
 
 let maze;
