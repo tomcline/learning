@@ -27,17 +27,17 @@ initializeEnemyType(enemyName) {
     }
     else if (this.enemyName == 'BLINKY') {
         this.color = color(255,0,0);
-        this.speed = 3;
+        this.speed = 1;
         this.enemyIndex = 1;
     }
     else if (this.enemyName == 'PINKY') {
         this.color = color(255,192,203);
-        this.speed = 5;
+        this.speed = 1;
         this.enemyIndex = 2;
     }
     else if (this.enemyName == 'CLYDE') {
         this.color = color(249,166,2);
-        this.speed = 7;
+        this.speed = 1;
         this.enemyIndex = 3;
     }
 }
@@ -56,9 +56,9 @@ pursue(player,maze,solver) {
     solver.solve();
     
     solver.generateSolutionPath();
-    solver.drawPathSolution(this.color);
     
-    console.log(this.enemyName + " " + frameCount % this.speed);
+    //solver.drawPathSolution(this.color);
+    
     if (frameCount % this.speed == 0) {
 
         let newPosition = solver.pathSolution[solver.pathSolution.length-2];

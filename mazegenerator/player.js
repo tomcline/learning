@@ -139,6 +139,13 @@ class Player extends Cell {
         return false;
     }
     move() {
+
+        player.isMoving = true;
+
+        if ( player.isMoving  && !gameSounds.pacSiren.isPlaying() ){
+            gameSounds.pacSiren.loop(0,1,.5);
+        }
+
         let didMove = false;
         //Not changing direction, attempt to move to desired direction
         if (!this.willChangeDirection && this.moveInDirection(this.desiredMovementDirection)) {
@@ -179,14 +186,12 @@ class Player extends Cell {
         this.i = normalizedPosition.i;
         this.j = normalizedPosition.j;
 
-
-
-
-
     }
 
     eat(cell) {
         cell.type = null;
+        gameSounds.pacChomp.stop();
+        gameSounds.pacChomp.play();
     }
     moveMouth() {
 

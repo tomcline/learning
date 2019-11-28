@@ -13,10 +13,24 @@ let enemies = [];
 let player;
 let solver;    
 let ghosties_img;
+let gameSounds = {
+    intro:null,
+    pacChomp: null,
+    pacDeath: null,
+    pacEatFruit: null,
+    pacEatGhost: null,
+    pacExtraPac: null,
+    pacIntermission: null,
+    pacSiren: null
+}
 
 
 //P5 js key handler.
 function keyPressed() {
+
+    gameSounds.intro.stop();
+
+
     if (maze && maze.isInitialized) {
        player.handleKeyPress(keyCode);
     }
@@ -24,10 +38,22 @@ function keyPressed() {
 
 
 function preload() {
+
+    gameSounds.intro = loadSound('sounds/pacman_beginning.wav');
+    gameSounds.pacChomp = loadSound('sounds/pacman_chomp.wav');
+    gameSounds.pacDeath = loadSound('sounds/pacman_death.wav');
+    gameSounds.pacEatFruit = loadSound('sounds/pacman_eatfruit.wav');
+    gameSounds.pacEatGhost = loadSound('sounds/pacman_eatghost.wav');
+    gameSounds.pacExtraPac = loadSound('sounds/pacman_extrapac.wav');
+    gameSounds.pacIntermission = loadSound('sounds/pacman_intermission.wav');
+    gameSounds.pacSiren = loadSound('sounds/pacman_siren_loop.ogg');
+
     ghosties_img = loadImage('images/ghosts.png');
 }
 
 function setup() {
+
+    gameSounds.intro.play();
 
     let winWidth = window.innerWidth;
     let winHeight = window.innerHeight;
@@ -83,7 +109,7 @@ function draw() {
             enemy.show();
         });
 
-        drawDebugInfo();
+        //drawDebugInfo();
 
 
 }
