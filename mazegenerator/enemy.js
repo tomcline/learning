@@ -14,6 +14,7 @@ class Enemy extends Player {
     this.isScared = false;
     this.isBlinking = false;
     this.enemyName = enemyName;
+    this.currentPath = [];
     
     this.initializeEnemyType(enemyName);
     
@@ -48,20 +49,46 @@ switchImage() {
 }
 pursue(player,maze,solver) {
     
-    maze.resetCellValues();
+    
+    this.maze.resetCellValues();
+    let newPosition = null;
 
-    solver.setOrigin(maze.getCell(this.i,this.j));
-    solver.setTarget(maze.getCell(player.i,player.j));
+    //If we are in the middle of a cell we may have a choice to make
+    if (this.isInMiddleOfCell()) {
+        //Get cell of current position.
+        let cell = this.maze.getCell(this.i,this.j);
+        //See if we have multiple routes to take.
+        //Currently allow for reversing direction....
+        if (cell.visitableNeighbors.length > 1){
+            solver.setOrigin(maze.getCell(this.i,this.j));
+            solver.setTarget(maze.getCell(player.i,player.j));
+            
+            solver.solve();
+            
+            solver.generateSolutionPath();
+
+            this.currentPath = solver.pathSolution;
+            
+            
+            newPosition = solver.pathSolution[solver.pathSolution.length-2];
+            
+            solver.reset();
+        }
+        else {
+            //Only one route is availale, let's go there.
+            if (cell.visitableNeighbors.length == 1) {
+                newPosition = {   
+                        i: cell.visitableNeighbors[0].i,
+                        j: cell.visitableNeighbors[0].j
+                    }
+            }
+        }
+    }
     
-    solver.solve();
     
-    solver.generateSolutionPath();
-    
-    //solver.drawPathSolution(this.color);
     
     if (frameCount % this.speed == 0) {
 
-        let newPosition = solver.pathSolution[solver.pathSolution.length-2];
         if (newPosition) {
             this.move(newPosition.i,newPosition.j);
         }
@@ -70,25 +97,8 @@ pursue(player,maze,solver) {
         }
     }
    
-    solver.reset();
 
 }
-/*
-move(newI,newJ){
-        
-        if (frameCount % this.speed == 0) {
-            //this.i = newI;
-            //this.j = newJ;
-            //Update i and j position.
-            let normalizedPosition = this.normalizePosition();
-            this.i = normalizedPosition.i;
-            this.j = normalizedPosition.j;
-        }
-        
-        
-
-    }
-    */
     move(newI,newJ){
             
                 var directionI = newI - this.i;
@@ -112,39 +122,6 @@ move(newI,newJ){
                 let normalizedPosition = this.normalizePosition();
                 this.i = normalizedPosition.i;
                 this.j = normalizedPosition.j;
-
-                
-                // var keyCode = this.desiredMovementDirection;
-                // if (directionI != 0) {
-                //     switch (directionI) {
-                //         case -1:
-                //             keyCode = LEFT_ARROW;
-                //             break;
-                //         case 1:
-                //             keyCode = RIGHT_ARROW;
-                //             break;
-                //         default:
-                //             break;
-                //     }
-                // }
-
-                // if (directionJ != 0) {
-                //     switch (directionJ) {
-                //         case -1:
-                //             keyCode = UP_ARROW;
-                //             break;
-                //         case 1:
-                //             keyCode = DOWN_ARROW;
-                //             break;
-                //         default:
-                //             break;
-                //     }
-                // }
-
-
-                // this.handleKeyPress(keyCode);
-
-
 
     }
     show(){

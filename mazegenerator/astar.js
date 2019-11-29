@@ -39,11 +39,11 @@ class AStar {
         });
 
     }
-    drawPathSolution(color) {
+    drawPathSolution(color,path) {
         noFill();
         beginShape();
-        for (var i = 0; i < this.pathSolution.length; i++) {
-            let cell = this.pathSolution[i];
+        for (var i = 0; i < path.length; i++) {
+            let cell = path[i];
             stroke(color);
             //strokeWeight(cell.w / 2);
             vertex(cell.i * cell.w + cell.w / 2, cell.j * cell.h + cell.h / 2);

@@ -1,10 +1,12 @@
 
+// TODO Enemy speed....
+
 // TODO Player enemy collisions
 // TODO New map generation? https://github.com/shaunlebron/pacman-mazegen
 // TODO Implement personalities into enemy movement...
 // FIXME Player warps through walls and gets out of syncp5.BandPass()
 
-
+let debug = false;
 let maze;
 let enemies = [];
 let player;
@@ -88,26 +90,31 @@ function drawDebugInfo(){
 
     enemies.forEach(enemy => {
         enemy.drawDebugInfo();
+        solver.drawPathSolution(enemy.color,enemy.currentPath);
     });
 }
 
 function draw() {
         
         background(51);
-    
-        maze.draw();    
 
+        
+        maze.draw();    
+        
         player.move();
         
         player.show();      
+        
         
         enemies.forEach(enemy => {
             enemy.pursue(player,maze,solver);
             enemy.show();
         });
 
-        //drawDebugInfo();
 
+        if (debug){
+            drawDebugInfo();
+        }
 
 }
 

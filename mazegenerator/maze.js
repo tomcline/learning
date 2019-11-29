@@ -79,8 +79,6 @@ class Maze {
                 this.stack.push(this.currentCell);
                 this.removeWalls(this.currentCell, nextCell);
 
-
-
                 this.currentCell = nextCell;
             } else if (this.stack.length > 0) {
                 this.currentCell = maze.stack.pop();
@@ -146,19 +144,21 @@ class Maze {
     removeWalls(currentCell, nextCell) {
         let x = currentCell.i - nextCell.i;
         let y = currentCell.j - nextCell.j;
-       
 
             if (x === 1) {
                 currentCell.walls[maze.WallPositions.LEFT].visible = false;
                 nextCell.walls[maze.WallPositions.RIGHT].visible = false;
                 currentCell.visitableNeighbors.push(nextCell);
                 nextCell.visitableNeighbors.push(currentCell);
+
             } else if (x === -1) {
                 currentCell.walls[maze.WallPositions.RIGHT].visible = false;
                 nextCell.walls[maze.WallPositions.LEFT].visible = false;
                 currentCell.visitableNeighbors.push(nextCell);
                 nextCell.visitableNeighbors.push(currentCell);
+                 
             }
+            
     
             if (y === 1) {
                 currentCell.walls[maze.WallPositions.TOP].visible = false;
@@ -171,7 +171,7 @@ class Maze {
                 currentCell.visitableNeighbors.push(nextCell);
                 nextCell.visitableNeighbors.push(currentCell);
             }
-       
+           
     }
 
 }
