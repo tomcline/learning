@@ -16,6 +16,14 @@ class Enemy extends Player {
         this.isBlinking = false;
         this.enemyName = enemyName;
         this.currentPath = [];
+        this.homePosition =  {
+            i: 0,
+            j: 0
+        }
+        this.previousMovement = {
+            x: 0,
+            y: 0
+        }
 
         this.initializeEnemyType(enemyName);
 
@@ -39,6 +47,10 @@ class Enemy extends Player {
             this.color = color(249, 166, 2);
             this.speed = 1;
             this.enemyIndex = 3;
+            this.homePosition = {
+                i: this.maze.rows-1,
+                j: this.maze.columns-1
+            }
         }
     }
     switchImage() {
@@ -47,16 +59,24 @@ class Enemy extends Player {
 
     }
     pursue(player, maze, solver) {
+1
 
+        let newPosition;
 
-        let newPosition = null;
+        let directionPosition = {
+            x:  0,
+            y: 0
+        };
 
         //If we are in the middle of a cell we may have a choice to make
+
         if (this.isInMiddleOfCell()) {
             //Get cell of current position.
             let cell = this.maze.getCell(this.i, this.j);
+
             //See if we have multiple routes to take.
             //Currently allow for reversing direction....
+            //
             if (cell.visitableNeighbors.length > 1) {
                 newPosition = this.calculateNewPosition(player, maze, solver);
             } else {
@@ -68,17 +88,60 @@ class Enemy extends Player {
                     }
                 }
             }
+            
+
+            let iDiff = newPosition.i - this.i;
+            let jDiff = newPosition.j - this.j;
+            let prevX = this.previousMovement.x;
+            let prevY = this.previousMovement.y;
+
+            let willChangeDirection = false;
+            console.log(iDiff,jDiff,prevX,prevY,iDiff+prevX,jDiff+prevY,this.enemyName);
+            if (prevX != 0 || prevY != 0) {
+                if (iDiff != 0 || jDiff != 0) {
+                    if (prevX != 0 && iDiff+prevX == 0) {
+                        willChangeDirection = true;
+                    }
+                    if (prevY != 0 && jDiff+prevY == 0) {
+                        willChangeDirection = true;
+                    }
+                }
+            }
+            else {
+                //console.log("No previous direction....");
+            }
+
+            
+
+            
+
+            if (!willChangeDirection) {
+                directionPosition = {
+                    x:  iDiff,
+                    y: jDiff
+                }
+            }
+            else {
+                directionPosition = {
+                    x: this.previousMovement.x,
+                    y: this.previousMovement.y
+                }
+            }
+           
+
+
+        }
+        else {
+            directionPosition = {
+               x: this.previousMovement.x,
+               y: this.previousMovement.y
+           }
         }
 
-
+        
 
         if (frameCount % this.speed == 0) {
-
-            if (newPosition) {
-                this.move(newPosition.i, newPosition.j);
-            } else {
-                this.move(this.i, this.j);
-            }
+            this.move(directionPosition);
         }
 
 
@@ -135,7 +198,7 @@ class Enemy extends Player {
                                                 
                         solver.setOrigin(maze.getCell(this.i, this.j));
                         if (distanceToPlayer < 6) {
-                            solver.setTarget(maze.getCell(this.maze.columns-1,this.maze.rows-1));
+                            solver.setTarget(maze.getCell(this.homePosition.j,this.homePosition.i));
                         }
                         else {
                             solver.setTarget(maze.getCell(player.i, player.j));
@@ -168,27 +231,31 @@ class Enemy extends Player {
                 break;
         }
   
+        //No positions were foud, assume ourself
+        if (newPosition == undefined) {
+            newPosition = {
+                i: this.i,
+                j: this.j
+            }
+        }
 
         return newPosition;
     }
 
-    move(newI, newJ) {
+    move(directionPosition) {
 
-        var directionI = newI - this.i;
-        var directionJ = newJ - this.j;
-        var directionPosition = {
-            x: directionI,
-            y: directionJ
-        };
 
-        if (this.isInMiddleOfCell()) {
+        //Only attempt to turn when in middle of cell
+        //Don't allow turning around.
+        //if (this.isInMiddleOfCell()) {
             this.x += directionPosition.x;
             this.y += directionPosition.y;
             this.previousMovement = directionPosition;
-        } else {
-            this.x += this.previousMovement.x;
-            this.y += this.previousMovement.y;
-        }
+        //}
+        //  else {
+        //     this.x += this.previousMovement.x;
+        //     this.y += this.previousMovement.y;
+        // }
 
         //Update i and j position.
         let normalizedPosition = this.normalizePosition();

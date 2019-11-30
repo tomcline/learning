@@ -1,13 +1,15 @@
 
 // TODO Enemy speed....
+// TODO Implement better enemy turn around prevention.....
+//TODO Optimize enemy turn checking - only check at intersections - i.e. not every time in middle of cell with forward backward options
 // TODO Need a game class. index.js is getting messy.
 //https://gameinternals.com/understanding-pac-man-ghost-behavior
 // TODO Player enemy collisions
+//TODO Keep Score
 // TODO New map generation? https://github.com/shaunlebron/pacman-mazegen
-// TODO Implement personalities into enemy movement...
 // FIXME Player warps through walls and gets out of syncp5.BandPass()
 
-let debug = true;
+let debug = false;
 let disableAllWalls = false;
 let maze;
 let enemies = [];
@@ -26,6 +28,11 @@ let gameSounds = {
     pacSiren: null
 }
 
+let keyCodes = {
+    D: 68,
+    SPACEBAR: 32
+}
+
 let enemyModes = {
     Wait: 0,
     Chase: 1,
@@ -39,6 +46,15 @@ game.enemyMode = enemyModes.Chase;
 
 //P5 js key handler.
 function keyPressed() {
+
+    //Turn on debugging
+    //D KEY
+    if (keyCode == keyCodes.D) {
+        debug = !debug;
+    }
+
+
+
 
     //Start game.
     if (!game.started && keyCode == ENTER){
@@ -54,8 +70,8 @@ function keyPressed() {
        player.handleKeyPress(keyCode);
     }
 
-
-    if (game.started && keyCode == 32) {
+    //SPACE BAR
+    if (game.started && keyCode == keyCodes.SPACEBAR) {
         game.paused = !game.paused;
         if (game.paused) {
             enemies.forEach(enemy => {
@@ -117,21 +133,17 @@ function setup() {
     enemies.push(blinky);
     enemies.push(pinky);
     enemies.push(clyde);
-
-
-
-
 }
 
 function drawDebugInfo(){
-    player.drawDebugInfo();
+    //player.drawDebugInfo();
 
     maze.grid.forEach(cell => {
-        cell.drawDebugInfo();
+        //cell.drawDebugInfo();
     });
 
     enemies.forEach(enemy => {
-        enemy.drawDebugInfo();
+        //enemy.drawDebugInfo();
         solver.drawPathSolution(enemy.color,enemy.currentPath);
     });
 }
