@@ -1,15 +1,16 @@
 
 // TODO Enemy speed....
-
+// TODO Proper ghost movement - https://gameinternals.com/understanding-pac-man-ghost-behavior
 // TODO Player enemy collisions
 // TODO New map generation? https://github.com/shaunlebron/pacman-mazegen
 // TODO Implement personalities into enemy movement...
 // FIXME Player warps through walls and gets out of syncp5.BandPass()
 
-let debug = false;
+let debug = true;
 let maze;
 let enemies = [];
 let player;
+let inky,pinky,blinky,clyde;
 let solver;    
 let ghosties_img;
 let gameSounds = {
@@ -22,13 +23,19 @@ let gameSounds = {
     pacIntermission: null,
     pacSiren: null
 }
+let enemyModes = {
+    Chase: 1,
+    Scatter: 2,
+    Frightened: 3
+}
+let game = {};
 
+game.enemyMode = enemyModes.Chase;
 
 //P5 js key handler.
 function keyPressed() {
 
     gameSounds.intro.stop();
-
 
     if (maze && maze.isInitialized) {
        player.handleKeyPress(keyCode);
@@ -71,10 +78,14 @@ function setup() {
     
     
     player = new Player(maze,maze.cellSize,maze.cellSize);
-    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'INKY',player));
-    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'BLINKY',player));
-    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'PINKY',player));
-    enemies.push(new Enemy(maze,maze.cellSize,maze.cellSize,'CLYDE',player));
+    inky = new Enemy(maze,maze.cellSize,maze.cellSize,'INKY',player);
+    blinky = new Enemy(maze,maze.cellSize,maze.cellSize,'BLINKY',player);
+    pinky = new Enemy(maze,maze.cellSize,maze.cellSize,'PINKY',player);
+    clyde = new Enemy(maze,maze.cellSize,maze.cellSize,'CLYDE',player);
+    enemies.push(inky);
+    enemies.push(blinky);
+    enemies.push(pinky);
+    enemies.push(clyde);
 
 
 
@@ -101,20 +112,20 @@ function draw() {
         
         maze.draw();    
         
+        
+        
         player.move();
         
         player.show();      
-        
         
         enemies.forEach(enemy => {
             enemy.pursue(player,maze,solver);
             enemy.show();
         });
-
-
+        
         if (debug){
             drawDebugInfo();
         }
-
+        
 }
 

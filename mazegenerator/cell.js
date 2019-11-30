@@ -19,7 +19,8 @@ class Cell {
         this.movementFrame = 0;
         this.debug = false;
 
-        this.walls = [{
+        this.walls = [
+            {
                 position: maze.WallPositions.TOP,
                 visible: true,
                 show: function (x, y, w, h) {

@@ -77,7 +77,7 @@ class Maze {
                 nextCell.visited = true;
 
                 this.stack.push(this.currentCell);
-                this.removeWalls(this.currentCell, nextCell);
+                //this.removeWalls(this.currentCell, nextCell);
 
                 this.currentCell = nextCell;
             } else if (this.stack.length > 0) {
@@ -89,6 +89,16 @@ class Maze {
 
 
         }
+
+        this.grid.forEach(cell => {
+                cell.neighbors.forEach (neighbor => {
+                    cell.visitableNeighbors.push(neighbor);
+            });
+            
+            cell.walls.forEach(wall => {
+                wall.visible = false;
+            });
+        });
 
     }
 
@@ -126,6 +136,19 @@ class Maze {
         return i + j * this.columns;
     }
     getCell(i,j){
+        //Normalize bounds so we don't exceed the tabel
+        if (i >= this.columns) {
+            i = this.columns-1;
+        }
+        else if (i < 0) {
+            i = 0;
+        }   
+        if (j >= this.rows) {
+            j = this.rows-1;
+        }
+        else if (j < 0 ){
+            j = 0;
+        }
         return this.grid[this.getIndex(i, j)];
     }
     updateEndPosiiton(i, j) {
@@ -145,6 +168,8 @@ class Maze {
         let x = currentCell.i - nextCell.i;
         let y = currentCell.j - nextCell.j;
 
+
+        
             if (x === 1) {
                 currentCell.walls[maze.WallPositions.LEFT].visible = false;
                 nextCell.walls[maze.WallPositions.RIGHT].visible = false;

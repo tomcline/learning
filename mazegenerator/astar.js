@@ -48,7 +48,18 @@ class AStar {
             //strokeWeight(cell.w / 2);
             vertex(cell.i * cell.w + cell.w / 2, cell.j * cell.h + cell.h / 2);
         }
+
+        
         endShape();
+        if (path.length > 0) {
+            let lastCell = path[0];
+            push();
+            color.setAlpha(75);
+            fill(color);
+            circle( (lastCell.i * lastCell.maze.cellSize) + lastCell.maze.cellSize/2, (lastCell.j * lastCell.maze.cellSize)  + lastCell.maze.cellSize/2 , lastCell.maze.cellSize/3 );
+            pop();
+            color.setAlpha(175);
+        }
 
     }
     generateSolutionPath() {
