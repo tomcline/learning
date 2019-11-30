@@ -16,7 +16,7 @@ class Enemy extends Player {
         this.isBlinking = false;
         this.enemyName = enemyName;
         this.currentPath = [];
-        this.homePosition =  {
+        this.homePosition = {
             i: 0,
             j: 0
         }
@@ -48,8 +48,8 @@ class Enemy extends Player {
             this.speed = 1;
             this.enemyIndex = 3;
             this.homePosition = {
-                i: this.maze.rows-1,
-                j: this.maze.columns-1
+                i: this.maze.rows - 1,
+                j: this.maze.columns - 1
             }
         }
     }
@@ -59,14 +59,13 @@ class Enemy extends Player {
 
     }
     pursue(player, maze, solver) {
-1
 
         let newPosition;
 
         let directionPosition = {
-            x:  0,
-            y: 0
-        };
+            x: this.previousMovement.x,
+            y: this.previousMovement.y
+        }
 
         //If we are in the middle of a cell we may have a choice to make
 
@@ -75,8 +74,6 @@ class Enemy extends Player {
             let cell = this.maze.getCell(this.i, this.j);
 
             //See if we have multiple routes to take.
-            //Currently allow for reversing direction....
-            //
             if (cell.visitableNeighbors.length > 1) {
                 newPosition = this.calculateNewPosition(player, maze, solver);
             } else {
@@ -88,59 +85,43 @@ class Enemy extends Player {
                     }
                 }
             }
-            
 
             let iDiff = newPosition.i - this.i;
             let jDiff = newPosition.j - this.j;
-            let prevX = this.previousMovement.x;
-            let prevY = this.previousMovement.y;
-
-            let willChangeDirection = false;
-            console.log(iDiff,jDiff,prevX,prevY,iDiff+prevX,jDiff+prevY,this.enemyName);
-            if (prevX != 0 || prevY != 0) {
-                if (iDiff != 0 || jDiff != 0) {
-                    if (prevX != 0 && iDiff+prevX == 0) {
-                        willChangeDirection = true;
-                    }
-                    if (prevY != 0 && jDiff+prevY == 0) {
-                        willChangeDirection = true;
-                    }
-                }
+            let willReverseDirection = false;
+           
+            //If our new offset is in the x direction 
+            //and our previous movement was in the x direction
+            //and our values are different it means we are trying to turn around
+            if ( (iDiff != 0 && this.previousMovement.x != 0) && iDiff != this.previousMovement.x) {
+                willReverseDirection = true;
             }
-            else {
-                //console.log("No previous direction....");
+            if ( (jDiff != 0 && this.previousMovement.y != 0) && jDiff != this.previousMovement.y) {
+                willReverseDirection = true;
+            }   
+
+            //If previous movement has not been set, OR, if we are taking a turn, set upcoming direction to previous to check next loop
+            if ((this.previousMovement.y == 0 && this.previousMovement.x == 0) || (this.previousMovement.y !=0 && iDiff !=0)  ||  (this.previousMovement.x != 0 && jDiff != 0)  ){
+                this.previousMovement = {
+                    x: iDiff,
+                    y: jDiff
+                };
             }
 
-            
-
-            
-
-            if (!willChangeDirection) {
+            //Not turning around
+            //set offset for movement
+            if (!willReverseDirection){
                 directionPosition = {
-                    x:  iDiff,
+                    x: iDiff,
                     y: jDiff
                 }
             }
-            else {
-                directionPosition = {
-                    x: this.previousMovement.x,
-                    y: this.previousMovement.y
-                }
-            }
-           
-
-
-        }
-        else {
-            directionPosition = {
-               x: this.previousMovement.x,
-               y: this.previousMovement.y
-           }
         }
 
-        
+
 
         if (frameCount % this.speed == 0) {
+            console.log(this.isInMiddleOfCell(),directionPosition,this.enemyName);
             this.move(directionPosition);
         }
 
@@ -158,7 +139,7 @@ class Enemy extends Player {
                 //Pinky - Target 4 tiles in front of current direction
                 //Inky - 2 tiles in front of Pac man, with a vector from Blinky to that position, doubled.
                 //Clyde - If > 8 tiles from pacman, keep targeting, if within <= 8 tiles, return to home target.
-                
+
                 switch (this.enemyName) {
                     case "BLINKY":
                         solver.setOrigin(maze.getCell(this.i, this.j));
@@ -168,51 +149,50 @@ class Enemy extends Player {
                         //Returns a direction base 1,0,-1 co-ordinate
                         var target = player.determineNewDirectionPosition(player.currentMovementDirection);
                         //Determine offset to adjust targets cells by
-                        target.x = target.x*4;
-                        target.y = target.y*4;
+                        target.x = target.x * 4;
+                        target.y = target.y * 4;
                         solver.setOrigin(maze.getCell(this.i, this.j));
                         solver.setTarget(maze.getCell(player.i + target.x, player.j + target.y));
                         //debugger;
                         break;
                     case "INKY":
-                            //Returns a direction base 1,0,-1 co-ordinate
-                            var playerTarget = player.determineNewDirectionPosition(player.currentMovementDirection);
-                            
-                            //Determine offset to adjust targets cells by
-                            //2 cells in front of players direction
-                            playerTarget.x = player.i + playerTarget.x*2;
-                            playerTarget.y = player.j + playerTarget.y*2;
-                          
-                            let inkyTargetPosition = {
-                                x:blinky.i + 2*(playerTarget.x-blinky.i),
-                                y:blinky.j + 2*(playerTarget.y-blinky.j)
-                            } 
-                            
-                            solver.setOrigin(maze.getCell(this.i, this.j));
-                            solver.setTarget(maze.getCell(inkyTargetPosition.x,inkyTargetPosition.y));
+                        //Returns a direction base 1,0,-1 co-ordinate
+                        var playerTarget = player.determineNewDirectionPosition(player.currentMovementDirection);
+
+                        //Determine offset to adjust targets cells by
+                        //2 cells in front of players direction
+                        playerTarget.x = player.i + playerTarget.x * 2;
+                        playerTarget.y = player.j + playerTarget.y * 2;
+
+                        let inkyTargetPosition = {
+                            x: blinky.i + 2 * (playerTarget.x - blinky.i),
+                            y: blinky.j + 2 * (playerTarget.y - blinky.j)
+                        }
+
+                        solver.setOrigin(maze.getCell(this.i, this.j));
+                        solver.setTarget(maze.getCell(inkyTargetPosition.x, inkyTargetPosition.y));
                         break;
                     case "CLYDE":
-                        let playerVector = createVector(player.i,player.j);
-                        let clydeVector = createVector(this.i,this.j);
-                        let distanceToPlayer =  Math.floor(clydeVector.dist(playerVector));
-                                                
+                        let playerVector = createVector(player.i, player.j);
+                        let clydeVector = createVector(this.i, this.j);
+                        let distanceToPlayer = Math.floor(clydeVector.dist(playerVector));
+
                         solver.setOrigin(maze.getCell(this.i, this.j));
                         if (distanceToPlayer < 6) {
-                            solver.setTarget(maze.getCell(this.homePosition.j,this.homePosition.i));
-                        }
-                        else {
+                            solver.setTarget(maze.getCell(this.homePosition.j, this.homePosition.i));
+                        } else {
                             solver.setTarget(maze.getCell(player.i, player.j));
                         }
                         break;
-                        
+
                     default:
-                            solver.setOrigin(maze.getCell(this.i, this.j));
-                            solver.setTarget(maze.getCell(player.i, player.j));
+                        solver.setOrigin(maze.getCell(this.i, this.j));
+                        solver.setTarget(maze.getCell(player.i, player.j));
                         break;
                 }
-                
-               
-                
+
+
+
 
                 solver.solve();
                 solver.generateSolutionPath();
@@ -221,16 +201,16 @@ class Enemy extends Player {
                 solver.reset();
                 break;
             case enemyModes.Scatter:
-                
+
                 break;
             case enemyModes.Frightened:
-                
+
                 break;
-        
+
             default:
                 break;
         }
-  
+
         //No positions were foud, assume ourself
         if (newPosition == undefined) {
             newPosition = {
@@ -247,10 +227,12 @@ class Enemy extends Player {
 
         //Only attempt to turn when in middle of cell
         //Don't allow turning around.
-        //if (this.isInMiddleOfCell()) {
-            this.x += directionPosition.x;
-            this.y += directionPosition.y;
-            this.previousMovement = directionPosition;
+        this.x += directionPosition.x;
+        this.y += directionPosition.y;
+        
+        
+        
+        
         //}
         //  else {
         //     this.x += this.previousMovement.x;
