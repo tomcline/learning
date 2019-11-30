@@ -77,7 +77,7 @@ class Maze {
                 nextCell.visited = true;
 
                 this.stack.push(this.currentCell);
-                //this.removeWalls(this.currentCell, nextCell);
+                this.removeWalls(this.currentCell, nextCell);
 
                 this.currentCell = nextCell;
             } else if (this.stack.length > 0) {
@@ -90,15 +90,18 @@ class Maze {
 
         }
 
-        this.grid.forEach(cell => {
-                cell.neighbors.forEach (neighbor => {
-                    cell.visitableNeighbors.push(neighbor);
+        //Turns off all walls
+        if (disableAllWalls){
+            this.grid.forEach(cell => {
+                    cell.neighbors.forEach (neighbor => {
+                        cell.visitableNeighbors.push(neighbor);
+                });
+    
+                cell.walls.forEach(wall => {
+                    wall.visible = false;
+                });
             });
-            
-            cell.walls.forEach(wall => {
-                wall.visible = false;
-            });
-        });
+        }
 
     }
 

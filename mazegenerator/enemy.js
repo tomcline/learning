@@ -10,6 +10,8 @@ class Enemy extends Player {
         this.speed = 0;
         this.enemyIndex = -1;
         this.imageIndex = -1;
+        this.mode = enemyModes.Wait;
+        this.modePrevious = enemyModes.Wait;
         this.isScared = false;
         this.isBlinking = false;
         this.enemyName = enemyName;
@@ -19,19 +21,20 @@ class Enemy extends Player {
 
 
     }
+
     initializeEnemyType(enemyName) {
         if (this.enemyName == 'INKY') {
             this.color = color(0, 255, 255);
             this.speed = 1;
-            this.enemyIndex = 0;
+            this.enemyIndex = 2;
         } else if (this.enemyName == 'BLINKY') {
             this.color = color(255, 0, 0);
             this.speed = 1;
-            this.enemyIndex = 1;
+            this.enemyIndex = 0;
         } else if (this.enemyName == 'PINKY') {
             this.color = color(255, 192, 203);
             this.speed = 1;
-            this.enemyIndex = 2;
+            this.enemyIndex = 1;
         } else if (this.enemyName == 'CLYDE') {
             this.color = color(249, 166, 2);
             this.speed = 1;
@@ -86,7 +89,7 @@ class Enemy extends Player {
         let newPosition;
         this.maze.resetCellValues();
 
-        switch (game.enemyMode) {
+        switch (this.mode) {
             case enemyModes.Chase:
                 //Blinky - Target Pacman
                 //Pinky - Target 4 tiles in front of current direction
@@ -129,9 +132,7 @@ class Enemy extends Player {
                         let playerVector = createVector(player.i,player.j);
                         let clydeVector = createVector(this.i,this.j);
                         let distanceToPlayer =  Math.floor(clydeVector.dist(playerVector));
-                        
-                        console.log(distanceToPlayer);
-                        
+                                                
                         solver.setOrigin(maze.getCell(this.i, this.j));
                         if (distanceToPlayer < 6) {
                             solver.setTarget(maze.getCell(this.maze.columns-1,this.maze.rows-1));

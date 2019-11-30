@@ -48,19 +48,21 @@ class AStar {
             //strokeWeight(cell.w / 2);
             vertex(cell.i * cell.w + cell.w / 2, cell.j * cell.h + cell.h / 2);
         }
-
-        
         endShape();
+
+
         if (path.length > 0) {
-            let lastCell = path[0];
+            let firstCell = path[0];
+            let lastCell = path[path.length-1];
             push();
             color.setAlpha(75);
             fill(color);
-            circle( (lastCell.i * lastCell.maze.cellSize) + lastCell.maze.cellSize/2, (lastCell.j * lastCell.maze.cellSize)  + lastCell.maze.cellSize/2 , lastCell.maze.cellSize/3 );
+            circle( (lastCell.i * lastCell.maze.cellSize) + lastCell.maze.cellSize/2, (lastCell.j * lastCell.maze.cellSize)  + lastCell.maze.cellSize/2 , lastCell.maze.cellSize/2);
+            circle( (firstCell.i * firstCell.maze.cellSize) + firstCell.maze.cellSize/2, (firstCell.j * firstCell.maze.cellSize)  + firstCell.maze.cellSize/2 , firstCell.maze.cellSize/2);
+            color.setAlpha(200);
             pop();
-            color.setAlpha(175);
         }
-
+        
     }
     generateSolutionPath() {
         this.pathSolution = [];

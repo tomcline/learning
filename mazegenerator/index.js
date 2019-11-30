@@ -1,12 +1,14 @@
 
 // TODO Enemy speed....
-// TODO Proper ghost movement - https://gameinternals.com/understanding-pac-man-ghost-behavior
+// TODO Need a game class. index.js is getting messy.
+//https://gameinternals.com/understanding-pac-man-ghost-behavior
 // TODO Player enemy collisions
 // TODO New map generation? https://github.com/shaunlebron/pacman-mazegen
 // TODO Implement personalities into enemy movement...
 // FIXME Player warps through walls and gets out of syncp5.BandPass()
 
 let debug = true;
+let disableAllWalls = false;
 let maze;
 let enemies = [];
 let player;
@@ -23,23 +25,52 @@ let gameSounds = {
     pacIntermission: null,
     pacSiren: null
 }
+
 let enemyModes = {
+    Wait: 0,
     Chase: 1,
     Scatter: 2,
     Frightened: 3
 }
 let game = {};
-
+game.started = false;
+game.paused = false;
 game.enemyMode = enemyModes.Chase;
 
 //P5 js key handler.
 function keyPressed() {
 
-    gameSounds.intro.stop();
-
-    if (maze && maze.isInitialized) {
+    //Start game.
+    if (!game.started && keyCode == ENTER){
+        game.started = true;
+        gameSounds.intro.stop();
+        enemies.forEach(enemy => {
+            enemy.mode = enemyModes.Chase;
+        });
+    }
+    
+    //Only response to key presses after game has started
+    if (game.started && !game.paused && (keyCode == UP_ARROW ||  keyCode == DOWN_ARROW || keyCode == RIGHT_ARROW || keyCode == LEFT_ARROW) && maze && maze.isInitialized) {
        player.handleKeyPress(keyCode);
     }
+
+
+    if (game.started && keyCode == 32) {
+        game.paused = !game.paused;
+        if (game.paused) {
+            enemies.forEach(enemy => {
+                enemy.modePrevious = enemy.mode;
+                enemy.mode = enemyModes.Wait;
+            });
+        }
+        else {
+            enemies.forEach(enemy => {
+                enemy.mode = enemy.modePrevious;
+
+            });
+        }
+    }
+
 }
 
 
@@ -113,8 +144,9 @@ function draw() {
         maze.draw();    
         
         
-        
-        player.move();
+        if (!game.paused) {
+            player.move();
+        }
         
         player.show();      
         
@@ -127,5 +159,24 @@ function draw() {
             drawDebugInfo();
         }
         
+
+        if (!game.started) {
+            push();
+            textSize(width*.1);
+            fill(235,255,0);
+            textAlign(CENTER, CENTER);
+             text("ENTER TO START", width/2, height/2);
+             pop();
+        }
+
+        if (game.paused) {
+            push();
+            textSize(width*.1);
+            fill(235,255,0);
+            textAlign(CENTER, CENTER);
+             text("PAUSED", width/2, height/2);
+             pop();
+        }
+
 }
 
