@@ -61,11 +61,9 @@ class Enemy extends Player {
     pursue(player, maze, solver) {
 
         let newPosition;
+        let willReverseDirection = false;
 
-        let directionPosition = {
-            x: this.previousMovement.x,
-            y: this.previousMovement.y
-        }
+        let directionPosition;
 
         //If we are in the middle of a cell we may have a choice to make
 
@@ -88,43 +86,72 @@ class Enemy extends Player {
 
             let iDiff = newPosition.i - this.i;
             let jDiff = newPosition.j - this.j;
-            let willReverseDirection = false;
-           
+
+
             //If our new offset is in the x direction 
             //and our previous movement was in the x direction
             //and our values are different it means we are trying to turn around
-            if ( (iDiff != 0 && this.previousMovement.x != 0) && iDiff != this.previousMovement.x) {
+            if ((iDiff != 0 && this.previousMovement.x != 0) && iDiff != this.previousMovement.x) {
                 willReverseDirection = true;
             }
-            if ( (jDiff != 0 && this.previousMovement.y != 0) && jDiff != this.previousMovement.y) {
+            if ((jDiff != 0 && this.previousMovement.y != 0) && jDiff != this.previousMovement.y) {
                 willReverseDirection = true;
-            }   
-
-            //If previous movement has not been set, OR, if we are taking a turn, set upcoming direction to previous to check next loop
-            if ((this.previousMovement.y == 0 && this.previousMovement.x == 0) || (this.previousMovement.y !=0 && iDiff !=0)  ||  (this.previousMovement.x != 0 && jDiff != 0)  ){
-                this.previousMovement = {
-                    x: iDiff,
-                    y: jDiff
-                };
             }
 
             //Not turning around
             //set offset for movement
-            if (!willReverseDirection){
+            if (!willReverseDirection) {
                 directionPosition = {
                     x: iDiff,
                     y: jDiff
                 }
+
+            }
+            else {
+                //If best path would reverse our direction,
+                //Pick a different neighbor
+                //Or, attempt to continue in current path
+                let bestCell =  this.maze.getCell(newPosition.i, newPosition.j);
+                let possibleRoutes = cell.visitableNeighbors.filter(item => item !== bestCell);
+                if (possibleRoutes.length > 0) {
+                    //Randomly select route - not how OG pacman does it...
+                    let randomDirection = floor(random(0,possibleRoutes.length-1));
+                    directionPosition = {
+                        x: possibleRoutes[randomDirection].i - this.i,
+                        y: possibleRoutes[randomDirection].j - this.j
+                    }
+                }
+                else {
+                        //Force direction reversal
+                        let newX = 0;
+                        let newY = 0;
+
+                        if (this.previousMovement.x != 0) {
+                            newX = this.previousMovement.x * -1;
+                        }
+
+                        if (this.previousMovement.y != 0) {
+                            newY = this.previousMovement.y * -1;
+                        }
+                        directionPosition = {
+                            x: newX,
+                            y: newY
+                        }
+
+                        console.warn(this.enemyName,directionPosition, "Cant go anywhere because maze is dumb... Prevent this in the future but allow for now.");
+                }
+            }
+        } else {
+           directionPosition = {
+                x: this.previousMovement.x,
+                y: this.previousMovement.y
             }
         }
 
 
-
         if (frameCount % this.speed == 0) {
-            console.log(this.isInMiddleOfCell(),directionPosition,this.enemyName);
             this.move(directionPosition);
         }
-
 
     }
 
@@ -224,48 +251,43 @@ class Enemy extends Player {
 
     move(directionPosition) {
 
+                
+                    this.previousMovement = {
+                        x: directionPosition.x,
+                        y: directionPosition.y
+                    };
 
-        //Only attempt to turn when in middle of cell
-        //Don't allow turning around.
-        this.x += directionPosition.x;
-        this.y += directionPosition.y;
-        
-        
-        
-        
-        //}
-        //  else {
-        //     this.x += this.previousMovement.x;
-        //     this.y += this.previousMovement.y;
-        // }
+                    this.x += directionPosition.x;
+                    this.y += directionPosition.y;
 
-        //Update i and j position.
-        let normalizedPosition = this.normalizePosition();
-        this.i = normalizedPosition.i;
-        this.j = normalizedPosition.j;
+                    //Update i and j position.
+                    let normalizedPosition = this.normalizePosition();
+                    this.i = normalizedPosition.i;
+                    this.j = normalizedPosition.j;
 
-    }
-    show() {
 
-        if (frameCount % 15 == 0) {
-            this.switchImage();
+        }
+        show() {
+
+            if (frameCount % 15 == 0) {
+                this.switchImage();
+            }
+
+            push();
+            //Thanks to human on the interwebz for building the enemy sprite.
+            var ghostIndex = this.isScared ? 4 : this.enemyIndex; // the vert ghost image
+            var imageIndex = this.isBlinking ? 2 : this.imageIndex; // horiz image
+
+
+            //image(ghosties_img, this.i*maze.cellSize, this.j*maze.cellSize, this.w, this.h, (42 * imageIndex), 43 * ghostIndex, 45, 45);
+            image(ghosties_img, this.x - this.w / 2, this.y - this.h / 2, this.w, this.h, (42 * imageIndex), 43 * ghostIndex, 45, 45);
+
+            pop();
+
+
+
+
+
         }
 
-        push();
-        //Thanks to human on the interwebz for building the enemy sprite.
-        var ghostIndex = this.isScared ? 4 : this.enemyIndex; // the vert ghost image
-        var imageIndex = this.isBlinking ? 2 : this.imageIndex; // horiz image
-
-
-        //image(ghosties_img, this.i*maze.cellSize, this.j*maze.cellSize, this.w, this.h, (42 * imageIndex), 43 * ghostIndex, 45, 45);
-        image(ghosties_img, this.x - this.w / 2, this.y - this.h / 2, this.w, this.h, (42 * imageIndex), 43 * ghostIndex, 45, 45);
-
-        pop();
-
-
-
-
-
     }
-
-}
