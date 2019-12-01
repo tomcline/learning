@@ -57,7 +57,7 @@ class AStar {
             push();
             color.setAlpha(75);
             fill(color);
-            circle( (lastCell.i * lastCell.maze.cellSize) + lastCell.maze.cellSize/2, (lastCell.j * lastCell.maze.cellSize)  + lastCell.maze.cellSize/2 , lastCell.maze.cellSize/2);
+            circle( (lastCell.i * lastCell.maze.cellSize) + lastCell.maze.cellSize/2, (lastCell.j * lastCell.maze.cellSize)  + lastCell.maze.cellSize/2 , lastCell.maze.cellSize/4);
             circle( (firstCell.i * firstCell.maze.cellSize) + firstCell.maze.cellSize/2, (firstCell.j * firstCell.maze.cellSize)  + firstCell.maze.cellSize/2 , firstCell.maze.cellSize/2);
             color.setAlpha(200);
             pop();

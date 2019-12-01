@@ -1,16 +1,16 @@
 
 // TODO Enemy speed....
-// TODO Implement better enemy turn around prevention.....
 //TODO Optimize enemy turn checking - only check at intersections - i.e. not every time in middle of cell with forward backward options
-// TODO Need a game class. index.js is getting messy.
+//TODO Move resources into game class
 //https://gameinternals.com/understanding-pac-man-ghost-behavior
 // TODO Player enemy collisions
 //TODO Keep Score
 // TODO New map generation? https://github.com/shaunlebron/pacman-mazegen
-// FIXME Player warps through walls and gets out of syncp5.BandPass()
+//https://github.com/shaunlebron/pacman-mazegen/blob/gh-pages/tetris/Map.js
+// FIXME Player warps through walls and gets out of sync
 
-let debug = false;
-let disableAllWalls = false;
+let game;
+let disableAllWalls = true;
 let maze;
 let enemies = [];
 let player;
@@ -28,65 +28,12 @@ let gameSounds = {
     pacSiren: null
 }
 
-let keyCodes = {
-    D: 68,
-    SPACEBAR: 32
-}
 
-let enemyModes = {
-    Wait: 0,
-    Chase: 1,
-    Scatter: 2,
-    Frightened: 3
-}
-let game = {};
-game.started = false;
-game.paused = false;
-game.enemyMode = enemyModes.Chase;
+let map = mapgen();
 
 //P5 js key handler.
 function keyPressed() {
-
-    //Turn on debugging
-    //D KEY
-    if (keyCode == keyCodes.D) {
-        debug = !debug;
-    }
-
-
-
-
-    //Start game.
-    if (!game.started && keyCode == ENTER){
-        game.started = true;
-        gameSounds.intro.stop();
-        enemies.forEach(enemy => {
-            enemy.mode = enemyModes.Chase;
-        });
-    }
-    
-    //Only response to key presses after game has started
-    if (game.started && !game.paused && (keyCode == UP_ARROW ||  keyCode == DOWN_ARROW || keyCode == RIGHT_ARROW || keyCode == LEFT_ARROW) && maze && maze.isInitialized) {
-       player.handleKeyPress(keyCode);
-    }
-
-    //SPACE BAR
-    if (game.started && keyCode == keyCodes.SPACEBAR) {
-        game.paused = !game.paused;
-        if (game.paused) {
-            enemies.forEach(enemy => {
-                enemy.modePrevious = enemy.mode;
-                enemy.mode = enemyModes.Wait;
-            });
-        }
-        else {
-            enemies.forEach(enemy => {
-                enemy.mode = enemy.modePrevious;
-
-            });
-        }
-    }
-
+    game.handleKeyPress(keyCode);
 }
 
 
@@ -116,6 +63,8 @@ function setup() {
 
     createCanvas(winWidth, winHeight);
 
+    game = new Game();
+    
     solver = new AStar();
 
     maze = new Maze(width, height);
@@ -133,6 +82,12 @@ function setup() {
     enemies.push(blinky);
     enemies.push(pinky);
     enemies.push(clyde);
+
+    game.player = player;
+    game.maze = maze;
+    game.enemies = enemies;
+
+
 }
 
 function drawDebugInfo(){
@@ -148,11 +103,26 @@ function drawDebugInfo(){
     });
 }
 
+
+function chunkArray(myArray, chunk_size){
+    var index = 0;
+    var arrayLength = myArray.length;
+    var tempArray = [];
+    
+    for (index = 0; index < arrayLength; index += chunk_size) {
+        myChunk = myArray.slice(index, index+chunk_size);
+        // Do something if you want with the group
+        tempArray.push(myChunk);
+    }
+
+    return tempArray;
+}
+
+
 function draw() {
         
         background(51);
 
-        
         maze.draw();    
         
         
@@ -163,11 +133,13 @@ function draw() {
         player.show();      
         
         enemies.forEach(enemy => {
-            enemy.pursue(player,maze,solver);
+            if (!game.paused) {
+                 enemy.pursue(player,maze,solver);
+            }
             enemy.show();
         });
         
-        if (debug){
+        if (game.debug){
             drawDebugInfo();
         }
         

@@ -10,8 +10,8 @@ class Enemy extends Player {
         this.speed = 0;
         this.enemyIndex = -1;
         this.imageIndex = -1;
-        this.mode = enemyModes.Wait;
-        this.modePrevious = enemyModes.Wait;
+        this.mode = game.enemyModes.Wait;
+        this.modePrevious = game.enemyModes.Wait;
         this.isScared = false;
         this.isBlinking = false;
         this.enemyName = enemyName;
@@ -66,10 +66,11 @@ class Enemy extends Player {
         let directionPosition;
 
         //If we are in the middle of a cell we may have a choice to make
-
+        //Otherwise, carry on in previous directions
+        let cell = this.maze.getCell(this.i, this.j);
+        
         if (this.isInMiddleOfCell()) {
             //Get cell of current position.
-            let cell = this.maze.getCell(this.i, this.j);
 
             //See if we have multiple routes to take.
             if (cell.visitableNeighbors.length > 1) {
@@ -84,6 +85,7 @@ class Enemy extends Player {
                 }
             }
 
+            //Calc our movement co-ords offset
             let iDiff = newPosition.i - this.i;
             let jDiff = newPosition.j - this.j;
 
@@ -91,6 +93,7 @@ class Enemy extends Player {
             //If our new offset is in the x direction 
             //and our previous movement was in the x direction
             //and our values are different it means we are trying to turn around
+            //Same for y
             if ((iDiff != 0 && this.previousMovement.x != 0) && iDiff != this.previousMovement.x) {
                 willReverseDirection = true;
             }
@@ -99,7 +102,7 @@ class Enemy extends Player {
             }
 
             //Not turning around
-            //set offset for movement
+            //set offset accordingly
             if (!willReverseDirection) {
                 directionPosition = {
                     x: iDiff,
@@ -133,6 +136,7 @@ class Enemy extends Player {
                         if (this.previousMovement.y != 0) {
                             newY = this.previousMovement.y * -1;
                         }
+
                         directionPosition = {
                             x: newX,
                             y: newY
@@ -161,7 +165,7 @@ class Enemy extends Player {
         this.maze.resetCellValues();
 
         switch (this.mode) {
-            case enemyModes.Chase:
+            case game.enemyModes.Chase:
                 //Blinky - Target Pacman
                 //Pinky - Target 4 tiles in front of current direction
                 //Inky - 2 tiles in front of Pac man, with a vector from Blinky to that position, doubled.
@@ -227,10 +231,10 @@ class Enemy extends Player {
                 newPosition = solver.pathSolution[solver.pathSolution.length - 2];
                 solver.reset();
                 break;
-            case enemyModes.Scatter:
+            case game.enemyModes.Scatter:
 
                 break;
-            case enemyModes.Frightened:
+            case game.enemyModes.Frightened:
 
                 break;
 
