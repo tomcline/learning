@@ -7,7 +7,7 @@ class Maze {
         this.AStar = null;
         this.pathSolution = [];
         this.stack = [];
-        this.cellSize = 24;
+        this.cellSize = 22;
         this.currentCell = null;
         this.WallPositions = {
             TOP: 0,
@@ -31,23 +31,21 @@ class Maze {
         maze.initialize(width, height);
         maze.buildMaze();
     }
-    initialize(width, height) {
-        let cols = Math.floor(width / this.cellSize);
-        let rows = Math.floor(height / this.cellSize);
-
+    initialize(map) {
+        let cols = map[0].length;
+        let rows = map.length;
         this.grid = [];
-
-        this.setRowsAndCols(rows, cols);
+        this.setRowsAndCols(cols, rows);
 
 
         for (let j = 0; j < rows; j++) {
             for (let i = 0; i < cols; i++) {
-                this.addCell(new Cell(i, j, this.cellSize, this.cellSize, this));
+                this.addCell(new Cell(i, j, this.cellSize, this.cellSize, this,map[j][i]));
             }
         }
 
         //Start building maze in top left corner
-        this.currentCell = maze.grid[0];
+        //this.currentCell = maze.grid[0];
         
         
     }
@@ -68,27 +66,27 @@ class Maze {
     }
     buildMaze() {
 
-        while (!maze.isInitialized) {
+        // while (!maze.isInitialized) {
 
-            let nextCell = this.currentCell.checkNeighbors();
+        //     let nextCell = this.currentCell.checkNeighbors();
 
-            if (nextCell) {
+        //     if (nextCell) {
 
-                nextCell.visited = true;
+        //         nextCell.visited = true;
 
-                this.stack.push(this.currentCell);
-                this.removeWalls(this.currentCell, nextCell);
+        //         this.stack.push(this.currentCell);
+        //         this.removeWalls(this.currentCell, nextCell);
 
-                this.currentCell = nextCell;
-            } else if (this.stack.length > 0) {
-                this.currentCell = maze.stack.pop();
-            } else {
-                //Maze is built.
-                this.prepareMazeToSolve();
-            }
+        //         this.currentCell = nextCell;
+        //     } else if (this.stack.length > 0) {
+        //         this.currentCell = maze.stack.pop();
+        //     } else {
+        //         //Maze is built.
+        //         this.prepareMazeToSolve();
+        //     }
 
 
-        }
+        // }
 
         //Turns off all walls
         if (disableAllWalls){
@@ -109,27 +107,7 @@ class Maze {
 
     }
     
-    setStartAndEnd(onlySetEnd) {
-        let maze = this;
-
-        if (maze.end) {
-            maze.end.type = null
-        }
-
-        if (onlySetEnd == undefined || onlySetEnd === false) {
-            if (maze.start) {
-                maze.start.type = null;
-            }
-            maze.start = maze.grid[floor(random(maze.grid.length - 1))];
-        }
-
-        maze.end = maze.grid[floor(random(maze.grid.length - 1))];
-
-        if (maze.start === maze.end) maze.setStartAndEnd(true);
-
-        maze.start.type = 'START';
-        maze.end.type = 'END';
-    }
+    
     getIndex(i, j) {
 
         if (i < 0 || j < 0 || i > this.columns - 1 || j > this.rows - 1) {
@@ -158,21 +136,13 @@ class Maze {
         this.end = this.grid[this.getIndex(i, j)];
     }
     prepareMazeToSolve() {
-
-        //this.setStartAndEnd();
-
-        //this.AStar = new AStar(this.start,this.end, color(255, 0, 0,200));
-
         this.isInitialized = true;
-
     }
     
     removeWalls(currentCell, nextCell) {
         let x = currentCell.i - nextCell.i;
         let y = currentCell.j - nextCell.j;
 
-
-        
             if (x === 1) {
                 currentCell.walls[maze.WallPositions.LEFT].visible = false;
                 nextCell.walls[maze.WallPositions.RIGHT].visible = false;

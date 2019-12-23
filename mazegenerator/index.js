@@ -61,17 +61,17 @@ function setup() {
     if (winWidth > winHeight) winWidth = winHeight;
     else if (winHeight > winWidth) winHeight = winWidth;
 
-    createCanvas(winWidth, winHeight);
-
+    
     game = new Game();
     
     solver = new AStar();
-
-    maze = new Maze(width, height);
-
-    maze.initialize(width, height);
-    maze.buildMaze();
     
+    maze = new Maze();
+    
+    maze.initialize(map);
+    console.log(map);
+    
+    createCanvas(maze.columns*maze.cellSize, maze.rows*maze.cellSize);
     
     player = new Player(maze,maze.cellSize,maze.cellSize);
     inky = new Enemy(maze,maze.cellSize,maze.cellSize,'INKY',player);

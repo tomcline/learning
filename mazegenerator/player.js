@@ -5,19 +5,15 @@ class Player extends Cell {
 
         h = height;
         w = width;
-
-        function determineStartPosition() {
-            tempCell = maze.grid[floor(random(maze.grid.length - 1))];
-            return tempCell;
-        }
-
-        tempCell = determineStartPosition();
-
-        i = tempCell.i;
-        j = tempCell.j;
-
+        //Starting cell.
+        i = 13;
+        j = 26;
 
         super(i, j, w, h, maze);
+
+        //Start in middle of start cells.
+        this.x = ((i * maze.cellSize) + (maze.cellSize / 2)) + (maze.cellSize / 2);
+        this.y = (j * maze.cellSize) + (maze.cellSize / 2);
 
         this.type = 'PLAYER';
         this.color = color(255, 255, 0);

@@ -53,7 +53,7 @@ class Game {
         if (game.paused) {
             this.enemies.forEach(enemy => {
                 enemy.modePrevious = enemy.mode;
-                enemy.mode = enemyModes.Wait;
+                enemy.mode = this.enemyModes.Wait;
             });
         }
         else {

@@ -2,7 +2,7 @@ var getRandomInt = function(min,max) {
     return Math.floor(Math.random() * (max-min+1)) + min;
 };
 
-var shuffle = function(list) {
+var shuffleItems = function(list) {
     var len = list.length;
     var i,j;
     var temp;
@@ -470,7 +470,7 @@ var genRandom = function() {
                     break;
                 }
             }
-            shuffle(candidates);
+            shuffleItems(candidates);
 
             var i;
             for (i=0; i<numCandidates; i++) {
@@ -536,7 +536,7 @@ var genRandom = function() {
                     break;
                 }
             }
-            shuffle(candidates);
+            shuffleItems(candidates);
 
             var i;
             for (i=0; i<numCandidates; i++) {
@@ -1454,7 +1454,6 @@ var mapgen = function() {
     // return map;
     let table = getTiles().split("");
     table = chunkArray(table,28);
-    console.log(table);
     //28,36 - row-col
 // size of a square tile in pixels
 // var tileSize = 8;
