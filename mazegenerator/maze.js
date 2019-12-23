@@ -9,12 +9,27 @@ class Maze {
         this.stack = [];
         this.cellSize = 22;
         this.currentCell = null;
-        this.WallPositions = {
+        
+
+        this.cellTypes = {
+            VerticalWall: '|',
+            HorizontalWall: '_',
+            EmptySpace: ' ',
+            Pellet: '.',
+            PowerPellet: 'o',
+            GhostDoor: '-',
+            GhostHouse: '*',
+            Tunnel: '='
+            
+        }
+
+        this.wallPositions = {
             TOP: 0,
             RIGHT: 1,
             BOTTOM: 2,
             LEFT: 3
         }
+
         this.columns = null;
         this.rows = null;
     }
@@ -151,14 +166,14 @@ class Maze {
         let y = currentCell.j - nextCell.j;
 
             if (x === 1) {
-                currentCell.walls[maze.WallPositions.LEFT].visible = false;
+                currentCell.walls[maze.wallPositions.LEFT].visible = false;
                 nextCell.walls[maze.WallPositions.RIGHT].visible = false;
                 currentCell.visitableNeighbors.push(nextCell);
                 nextCell.visitableNeighbors.push(currentCell);
 
             } else if (x === -1) {
-                currentCell.walls[maze.WallPositions.RIGHT].visible = false;
-                nextCell.walls[maze.WallPositions.LEFT].visible = false;
+                currentCell.walls[maze.wallPositions.RIGHT].visible = false;
+                nextCell.walls[maze.wallPositions.LEFT].visible = false;
                 currentCell.visitableNeighbors.push(nextCell);
                 nextCell.visitableNeighbors.push(currentCell);
                  
@@ -166,13 +181,13 @@ class Maze {
             
     
             if (y === 1) {
-                currentCell.walls[maze.WallPositions.TOP].visible = false;
-                nextCell.walls[maze.WallPositions.BOTTOM].visible = false;
+                currentCell.walls[maze.WwllPositions.TOP].visible = false;
+                nextCell.walls[maze.wallPositions.BOTTOM].visible = false;
                 currentCell.visitableNeighbors.push(nextCell);
                 nextCell.visitableNeighbors.push(currentCell);
             } else if (y === -1) {
-                currentCell.walls[maze.WallPositions.BOTTOM].visible = false;
-                nextCell.walls[maze.WallPositions.TOP].visible = false;
+                currentCell.walls[maze.wallPositions.BOTTOM].visible = false;
+                nextCell.walls[maze.wallPositions.TOP].visible = false;
                 currentCell.visitableNeighbors.push(nextCell);
                 nextCell.visitableNeighbors.push(currentCell);
             }

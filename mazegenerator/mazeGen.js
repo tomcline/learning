@@ -1082,20 +1082,22 @@ var getTiles = function() {
 
     // create the ghost door and ghost house
     setTile(2,12,'-');
-    setTile(1,13,'-');
-    setTile(2,13,'-');
-    setTile(3,13,'-');
-    setTile(4,13,'-');
 
-    setTile(1,14,'-');
-    setTile(2,14,'-');
-    setTile(3,14,'-');
-    setTile(4,14,'-');
 
-    setTile(1,15,'-');
-    setTile(2,15,'-');
-    setTile(3,15,'-');
-    setTile(4,15,'-');
+    setTile(1,13,'*');
+    setTile(2,13,'*');
+    setTile(3,13,'*');
+    setTile(4,13,'*');
+
+    setTile(1,14,'*');
+    setTile(2,14,'*');
+    setTile(3,14,'*');
+    setTile(4,14,'*');
+
+    setTile(1,15,'*');
+    setTile(2,15,'*');
+    setTile(3,15,'*');
+    setTile(4,15,'*');
 
 
 
@@ -1171,7 +1173,7 @@ var getTiles = function() {
                 adj.push({x:x,y:y+1});
             }
             if (adj.length == 1) {
-                setTile(x,y,' ');
+                setTile(x,y,'=');
                 x = adj[0].x;
                 y = adj[0].y;
             }

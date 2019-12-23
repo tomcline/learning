@@ -184,7 +184,7 @@ class Player extends Cell {
     }
 
     eat(cell) {
-        cell.type = ' ';
+        cell.type = maze.cellTypes.EmptySpace;
         gameSounds.pacChomp.stop();
         gameSounds.pacChomp.play();
     }
@@ -260,7 +260,7 @@ class Player extends Cell {
 
         let mazeCell = this.maze.getCell(this.i, this.j);
 
-        if (mazeCell.type == '.' || mazeCell.type == 'o') {
+        if (mazeCell.type == maze.cellTypes.Pellet || mazeCell.type == maze.cellTypes.PowerPellet) {
             this.eat(mazeCell);
         }
 

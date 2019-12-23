@@ -1,5 +1,5 @@
 class Cell {
-    constructor(i, j, w, h, maze,cell) {
+    constructor(i, j, w, h, maze,cellType) {
         this.i = i;
         this.j = j;
         this.w = w;
@@ -8,7 +8,7 @@ class Cell {
         this.y = (j * maze.cellSize) + (maze.cellSize / 2);
         this.color = color(255,255,255);
         this.visited = false;
-        this.type = cell;
+        this.type = cellType;
         this.fScore = 0;
         this.gScore = 0;
         this.hScore = 0;
@@ -21,28 +21,28 @@ class Cell {
 
         this.walls = [
             {
-                position: maze.WallPositions.TOP,
+                position: maze.wallPositions.TOP,
                 visible: false,
                 show: function (x, y, w, h) {
                     line(x, y+h, x + w, y+h);
                 }
             },
             {
-                position: maze.WallPositions.RIGHT,
+                position: maze.wallPositions.RIGHT,
                 visible: false,
                 show: function (x, y, w, h) {
                     line(x + w, y, x + w, y + h);
                 }
             },
             {
-                position: maze.WallPositions.BOTTOM,
+                position: maze.wallPositions.BOTTOM,
                 visible: false,
                 show: function (x, y, w, h) {
                     line(x + w, y + h, x, y + h);
                 }
             },
             {
-                position: maze.WallPositions.LEFT,
+                position: maze.wallPositions.LEFT,
                 visible: false,
                 show: function (x, y, w, h) {
                     line(x, y + h, x, y);
@@ -52,20 +52,20 @@ class Cell {
 
 
          //Vertical wall
-         if (this.type == '|') {
-           this.walls[maze.WallPositions.LEFT].visible = true;
-           this.walls[maze.WallPositions.RIGHT].visible = true;
-           this.walls[maze.WallPositions.TOP].visible = false;
-           this.walls[maze.WallPositions.BOTTOM].visible = false;
+         if (this.type == maze.cellTypes.VerticalWall) {
+           this.walls[maze.wallPositions.LEFT].visible = true;
+           this.walls[maze.wallPositions.RIGHT].visible = true;
+           this.walls[maze.wallPositions.TOP].visible = false;
+           this.walls[maze.wallPositions.BOTTOM].visible = false;
 
         }
         
         //Horizontal wall
-        if (this.type == '_') {
-            this.walls[maze.WallPositions.TOP].visible = true;
-            this.walls[maze.WallPositions.BOTTOM].visible = true;
-            this.walls[maze.WallPositions.LEFT].visible = false;
-            this.walls[maze.WallPositions.RIGHT].visible = false;
+        if (this.type == maze.cellTypes.HorizontalWall) {
+            this.walls[maze.wallPositions.TOP].visible = true;
+            this.walls[maze.wallPositions.BOTTOM].visible = true;
+            this.walls[maze.wallPositions.LEFT].visible = false;
+            this.walls[maze.wallPositions.RIGHT].visible = false;
         }
 
 
@@ -87,9 +87,11 @@ class Cell {
         this.neighbors = neighbors.filter(index => (index !== undefined && index !== null));
 
         this.neighbors.forEach(cell => {
-            if (cell.type != '|' && cell.type != '_' ) {
+            if (cell.type != maze.cellTypes.VerticalWall && cell.type != maze.cellTypes.HorizontalWall ) {
                 this.visitableNeighbors.push(cell);
             }
+
+
         });
 
     }
@@ -153,15 +155,33 @@ class Cell {
 
 
         //Ghost door
-        if (this.type == '-') {
+        if (this.type == maze.cellTypes.GhostDoor) {
             push();
-            fill(255, 255, 100);
+            fill(100, 50, 100);
             rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
             pop();
         }
 
+
+        //Ghost house
+        if (this.type == maze.cellTypes.GhostHouse) {
+            push();
+            fill(50, 50, 255);
+            rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
+            pop();
+        }
+
+    //Tunnel
+    if (this.type == maze.cellTypes.Tunnel) {
+        push();
+        fill(255, 50, 100);
+        rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
+        pop();
+    }
+
+
         //Empty space
-        if (this.type == ' ') {
+        if (this.type == maze.cellTypes.EmptySpace) {
             push();
             fill(100, 100, 255);
             rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
@@ -169,7 +189,7 @@ class Cell {
         }
 
         //Food
-        if (this.type == '.') {
+        if (this.type == maze.cellTypes.Pellet) {
             push();
             fill(255, 255, 255);
             circle((this.i * this.maze.cellSize) + this.maze.cellSize / 2, (this.j * this.maze.cellSize) + this.maze.cellSize / 2, this.maze.cellSize / 12);
@@ -177,7 +197,7 @@ class Cell {
         }
 
         //Power pellet
-        if (this.type == 'o') {
+        if (this.type == maze.cellTypes.PowerPellet) {
             push();
             fill(255, 255, 255);
             circle((this.i * this.maze.cellSize) + this.maze.cellSize / 2, (this.j * this.maze.cellSize) + this.maze.cellSize / 2, this.maze.cellSize / 4);
@@ -185,19 +205,19 @@ class Cell {
         }
 
         //Vertical wall
-        if (this.type == '|') {
+        if (this.type == maze.cellTypes.VerticalWall) {
             fill(255, 100, 255);
             rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
-           this.walls[maze.WallPositions.LEFT].show(x,y,w,h);
-           this.walls[maze.WallPositions.RIGHT].show(x,y,w,h);
+           this.walls[maze.wallPositions.LEFT].show(x,y,w,h);
+           this.walls[maze.wallPositions.RIGHT].show(x,y,w,h);
         }
         
         //Horizontal wall
-        if (this.type == '_') {
+        if (this.type == maze.cellTypes.HorizontalWall) {
             fill(255, 100, 255);
             rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
-            this.walls[maze.WallPositions.TOP].show(x,y,w,h);
-            this.walls[maze.WallPositions.BOTTOM].show(x,y,w,h);
+            this.walls[maze.wallPositions.TOP].show(x,y,w,h);
+            this.walls[maze.wallPositions.BOTTOM].show(x,y,w,h);
         }
         
 
