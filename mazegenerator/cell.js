@@ -50,6 +50,25 @@ class Cell {
             }
         ];
 
+
+         //Vertical wall
+         if (this.type == '|') {
+           this.walls[maze.WallPositions.LEFT].visible = true;
+           this.walls[maze.WallPositions.RIGHT].visible = true;
+           this.walls[maze.WallPositions.TOP].visible = false;
+           this.walls[maze.WallPositions.BOTTOM].visible = false;
+
+        }
+        
+        //Horizontal wall
+        if (this.type == '_') {
+            this.walls[maze.WallPositions.TOP].visible = true;
+            this.walls[maze.WallPositions.BOTTOM].visible = true;
+            this.walls[maze.WallPositions.LEFT].visible = false;
+            this.walls[maze.WallPositions.RIGHT].visible = false;
+        }
+
+
     }
 
     reset() {
@@ -66,6 +85,12 @@ class Cell {
         neighbors.push(maze.grid[maze.getIndex(this.i - 1, this.j)]);
         //Remove neighbor items which do not exist, i.e: edges
         this.neighbors = neighbors.filter(index => (index !== undefined && index !== null));
+
+        this.neighbors.forEach(cell => {
+            if (cell.type != '|' && cell.type != '_' ) {
+                this.visitableNeighbors.push(cell);
+            }
+        });
 
     }
 
@@ -165,24 +190,14 @@ class Cell {
             rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
            this.walls[maze.WallPositions.LEFT].show(x,y,w,h);
            this.walls[maze.WallPositions.RIGHT].show(x,y,w,h);
-           this.walls[maze.WallPositions.LEFT].visible = true;
-           this.walls[maze.WallPositions.RIGHT].visible = true;
-           this.walls[maze.WallPositions.TOP].visible = false;
-           this.walls[maze.WallPositions.BOTTOM].visible = false;
-
         }
         
         //Horizontal wall
         if (this.type == '_') {
             fill(255, 100, 255);
             rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
-
             this.walls[maze.WallPositions.TOP].show(x,y,w,h);
             this.walls[maze.WallPositions.BOTTOM].show(x,y,w,h);
-            this.walls[maze.WallPositions.TOP].visible = true;
-            this.walls[maze.WallPositions.BOTTOM].visible = true;
-            this.walls[maze.WallPositions.LEFT].visible = false;
-            this.walls[maze.WallPositions.RIGHT].visible = false;
         }
         
 

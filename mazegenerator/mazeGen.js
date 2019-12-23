@@ -1080,9 +1080,26 @@ var getTiles = function() {
         }
     }
 
-    // create the ghost door
+    // create the ghost door and ghost house
     setTile(2,12,'-');
+    setTile(1,13,'-');
+    setTile(2,13,'-');
+    setTile(3,13,'-');
+    setTile(4,13,'-');
 
+    setTile(1,14,'-');
+    setTile(2,14,'-');
+    setTile(3,14,'-');
+    setTile(4,14,'-');
+
+    setTile(1,15,'-');
+    setTile(2,15,'-');
+    setTile(3,15,'-');
+    setTile(4,15,'-');
+
+
+
+   
     // set energizers
     var getTopEnergizerRange = function() {
         var miny;

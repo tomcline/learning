@@ -1,20 +1,19 @@
 class Player extends Cell {
-    constructor(maze, height, width) {
+    constructor(startPosition,maze, height, width) {
 
         let i, j, w, h, tempCell;
 
         h = height;
         w = width;
-        //Starting cell.
-        i = 13;
-        j = 26;
 
-        super(i, j, w, h, maze);
 
-        //Start in middle of start cells.
-        this.x = ((i * maze.cellSize) + (maze.cellSize / 2)) + (maze.cellSize / 2);
-        this.y = (j * maze.cellSize) + (maze.cellSize / 2);
+        super(startPosition.i, startPosition.j, w, h, maze);
 
+        //Start in middle of start cell region.
+        this.x = ((startPosition.i * maze.cellSize) + (maze.cellSize / 2)) + (maze.cellSize / 2);
+        this.y = (startPosition.j * maze.cellSize) + (maze.cellSize / 2);
+        
+        this.startPosition = startPosition;
         this.type = 'PLAYER';
         this.color = color(255, 255, 0);
         this.isMoving = false;
@@ -185,7 +184,7 @@ class Player extends Cell {
     }
 
     eat(cell) {
-        cell.type = null;
+        cell.type = ' ';
         gameSounds.pacChomp.stop();
         gameSounds.pacChomp.play();
     }
@@ -261,7 +260,7 @@ class Player extends Cell {
 
         let mazeCell = this.maze.getCell(this.i, this.j);
 
-        if (mazeCell.type == 'DOT') {
+        if (mazeCell.type == '.' || mazeCell.type == 'o') {
             this.eat(mazeCell);
         }
 

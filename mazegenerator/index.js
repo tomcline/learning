@@ -69,15 +69,13 @@ function setup() {
     maze = new Maze();
     
     maze.initialize(map);
-    console.log(map);
     
     createCanvas(maze.columns*maze.cellSize, maze.rows*maze.cellSize);
-    
-    player = new Player(maze,maze.cellSize,maze.cellSize);
-    inky = new Enemy(maze,maze.cellSize,maze.cellSize,'INKY',player);
-    blinky = new Enemy(maze,maze.cellSize,maze.cellSize,'BLINKY',player);
-    pinky = new Enemy(maze,maze.cellSize,maze.cellSize,'PINKY',player);
-    clyde = new Enemy(maze,maze.cellSize,maze.cellSize,'CLYDE',player);
+    player = new Player({i:13,j:26},maze,maze.cellSize,maze.cellSize);
+    inky = new Enemy({i:12,j:17},maze,maze.cellSize,maze.cellSize,'INKY',player);
+    blinky = new Enemy({i:13,j:17},maze,maze.cellSize,maze.cellSize,'BLINKY',player);
+    pinky = new Enemy({i:14,j:17},maze,maze.cellSize,maze.cellSize,'PINKY',player);
+    clyde = new Enemy({i:15,j:17},maze,maze.cellSize,maze.cellSize,'CLYDE',player);
     enemies.push(inky);
     enemies.push(blinky);
     enemies.push(pinky);

@@ -37,12 +37,19 @@ class Maze {
         this.grid = [];
         this.setRowsAndCols(cols, rows);
 
-
+        console.log(map);
         for (let j = 0; j < rows; j++) {
             for (let i = 0; i < cols; i++) {
                 this.addCell(new Cell(i, j, this.cellSize, this.cellSize, this,map[j][i]));
             }
         }
+
+        
+        this.grid.forEach(cell => {
+            cell.addNeighbors();
+        });
+
+        this.prepareMazeToSolve();
 
         //Start building maze in top left corner
         //this.currentCell = maze.grid[0];

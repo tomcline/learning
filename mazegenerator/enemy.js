@@ -1,11 +1,16 @@
 class Enemy extends Player {
-    constructor(maze, height, width, enemyName, player) {
-        super(maze, height, width);
-
-
+    constructor(startPosition,maze, height, width, enemyName, player) {
+        
+        
+        super(startPosition,maze, height, width);
+        
+        
         let origin = maze.getCell(this.i, this.j);
-        let target = maze.getCell(player.i, player.j)
+        let target = maze.getCell(player.i, player.j);
 
+        this.x = (startPosition.i * maze.cellSize) + (maze.cellSize / 2);
+        this.y = (startPosition.j * maze.cellSize) + (maze.cellSize / 2);
+        
         this.type = 'ENEMY';
         this.speed = 0;
         this.enemyIndex = -1;
@@ -71,7 +76,6 @@ class Enemy extends Player {
         
         if (this.isInMiddleOfCell()) {
             //Get cell of current position.
-
             //See if we have multiple routes to take.
             if (cell.visitableNeighbors.length > 1) {
                 newPosition = this.calculateNewPosition(player, maze, solver);
