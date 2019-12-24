@@ -1,4 +1,5 @@
 //TODO Tunnel run
+//TODO Enemies can still turn
 //TODO Implement restart/reset 
 // TODO Enemy speed....
 //TODO Optimize enemy turn checking - only check at intersections - i.e. not every time in middle of cell with forward backward options
@@ -97,7 +98,7 @@ function drawDebugInfo(){
     //player.drawDebugInfo();
 
     maze.grid.forEach(cell => {
-        cell.drawDebugInfo();
+        //cell.drawDebugInfo();
     });
 
     enemies.forEach(enemy => {
