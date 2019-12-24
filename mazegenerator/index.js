@@ -92,7 +92,7 @@ function drawDebugInfo(){
     //player.drawDebugInfo();
 
     maze.grid.forEach(cell => {
-        //cell.drawDebugInfo();
+        cell.drawDebugInfo();
     });
 
     enemies.forEach(enemy => {

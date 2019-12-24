@@ -52,7 +52,6 @@ class Maze {
         this.grid = [];
         this.setRowsAndCols(cols, rows);
 
-        console.log(map);
         for (let j = 0; j < rows; j++) {
             for (let i = 0; i < cols; i++) {
                 this.addCell(new Cell(i, j, this.cellSize, this.cellSize, this,map[j][i]));
@@ -62,6 +61,107 @@ class Maze {
         
         this.grid.forEach(cell => {
             cell.addNeighbors();
+            let maze = cell.maze;
+
+
+            //Brute force ghost house
+            if (cell.type == cell.maze.cellTypes.GhostHouse) {
+                if (cell.i == 11 && cell.j == 16) {
+                    cell.wallPosition = 'TT';
+                }
+                if (cell.i == 11 && cell.j == 17) {
+                    cell.wallPosition = 'TTL';
+                }
+            }
+
+            if (cell.type == maze.cellTypes.VerticalWall || cell.type == maze.cellTypes.HorizontalWall) {
+                let down = maze.grid[maze.getIndex(cell.i, cell.j + 1)];
+                let up = maze.grid[maze.getIndex(cell.i, cell.j - 1)];
+                let left = maze.grid[maze.getIndex(cell.i - 1, cell.j)];
+                let right = maze.grid[maze.getIndex(cell.i + 1, cell.j)];
+                let leftEdge = false, rightEdge = false, topEdge = false, bottomEdge = false;
+
+                if (left && left.type != maze.cellTypes.VerticalWall && left.type != maze.cellTypes.HorizontalWall) {
+                    leftEdge = true;
+                }
+
+                if (right && right.type != maze.cellTypes.VerticalWall && right.type != maze.cellTypes.HorizontalWall) {
+                    rightEdge = true;
+                }
+
+                 if (up && up.type != maze.cellTypes.VerticalWall && up.type != maze.cellTypes.HorizontalWall) {
+                    topEdge = true;
+                }
+
+                 if (down && down.type != maze.cellTypes.VerticalWall && down.type != maze.cellTypes.HorizontalWall) {
+                    bottomEdge = true;
+                }
+
+                //Corner check
+                if ((leftEdge || rightEdge) && (topEdge || bottomEdge)) {
+                    cell.corner = true;
+                    if (leftEdge && topEdge) {
+                        cell.wallPosition = 'BR';
+                    } else if (leftEdge && bottomEdge) {
+                        cell.wallPosition = 'TR';
+                    } else if (rightEdge && topEdge) {
+                        cell.wallPosition = 'BL';
+                    } else if (rightEdge && bottomEdge) {
+                        cell.wallPosition = 'TL';
+                    }
+                    if (cell.type == maze.cellTypes.GhostHouse) {
+                        debugger;
+                    }
+                } else {
+
+                    if (topEdge) {
+                        cell.wallPosition = 'T';
+                    } else if (bottomEdge) {
+                        cell.wallPosition = 'B';
+                    }
+                    else if (leftEdge) {
+                        cell.wallPosition = 'L';
+                    } else if (rightEdge) {
+                        cell.wallPosition = 'R';
+                    }
+                }
+                
+                //Interior corner check
+               if (cell.wallPosition == 'Z' && cell.type == maze.cellTypes.VerticalWall) {
+                let upleft = maze.grid[maze.getIndex(cell.i-1, cell.j - 1)];
+                let upright = maze.grid[maze.getIndex(cell.i+1, cell.j - 1)];
+                let downleft = maze.grid[maze.getIndex(cell.i - 1, cell.j+1)];
+                let downright = maze.grid[maze.getIndex(cell.i + 1, cell.j+1)];
+                
+                if (upleft && upleft.type != maze.cellTypes.VerticalWall && upleft.type != maze.cellTypes.HorizontalWall) {
+                    cell.corner = true;
+                    cell.wallPosition = 'TL';
+                    
+                }
+                
+                else if (upright && upright.type != maze.cellTypes.VerticalWall && upright.type != maze.cellTypes.HorizontalWall) {
+                    cell.corner = true;
+                    cell.wallPosition = 'TR';
+                    
+                }
+                
+                else if (downleft && downleft.type != maze.cellTypes.VerticalWall && downleft.type != maze.cellTypes.HorizontalWall) {
+                    cell.corner = true;
+                    cell.wallPosition = 'BL';
+                }
+                
+                else if (downright && downright.type != maze.cellTypes.VerticalWall && downright.type != maze.cellTypes.HorizontalWall) {
+                    cell.corner = true;
+                    cell.wallPosition = 'BR';
+
+                }
+
+
+
+               }
+ 
+            }
+
         });
 
         this.prepareMazeToSolve();

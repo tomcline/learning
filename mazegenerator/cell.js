@@ -1,12 +1,12 @@
 class Cell {
-    constructor(i, j, w, h, maze,cellType) {
+    constructor(i, j, w, h, maze, cellType) {
         this.i = i;
         this.j = j;
         this.w = w;
         this.h = h;
         this.x = (i * maze.cellSize) + (maze.cellSize / 2);
         this.y = (j * maze.cellSize) + (maze.cellSize / 2);
-        this.color = color(255,255,255);
+        this.color = color(255, 255, 255);
         this.visited = false;
         this.type = cellType;
         this.fScore = 0;
@@ -19,7 +19,7 @@ class Cell {
         this.movementFrame = 0;
         this.debug = false;
         this.corner = false;
-        this.wallPosition = '';
+        this.wallPosition = 'Z';
 
 
     }
@@ -44,70 +44,9 @@ class Cell {
         this.neighbors = neighbors.filter(index => (index !== undefined && index !== null));
 
         this.neighbors.forEach(cell => {
-            if (cell.type != maze.cellTypes.VerticalWall && cell.type != maze.cellTypes.HorizontalWall ) {
+            if (cell.type != maze.cellTypes.VerticalWall && cell.type != maze.cellTypes.HorizontalWall) {
                 this.visitableNeighbors.push(cell);
             }
-
-            if (this.type ==  maze.cellTypes.VerticalWall || this.type ==  maze.cellTypes.HorizontalWall) {
-                let down = maze.grid[maze.getIndex(this.i, this.j + 1)];
-                let up = maze.grid[maze.getIndex(this.i, this.j - 1)];
-                let left = maze.grid[maze.getIndex(this.i - 1, this.j)];
-                let right = maze.grid[maze.getIndex(this.i + 1, this.j)];
-                let leftEdge,rightEdge,topEdge,bottomEdge = false;
-
-                if (left && left.type != maze.cellTypes.VerticalWall && left.type != maze.cellTypes.HorizontalWall ) {
-                    leftEdge = true;
-                }
-
-                if (right && right.type != maze.cellTypes.VerticalWall && right.type != maze.cellTypes.HorizontalWall ) {
-                    rightEdge = true;
-                }
-
-                if (up && up.type != maze.cellTypes.VerticalWall && up.type != maze.cellTypes.HorizontalWall ) {
-                    topEdge = true;
-                }
-
-                if (down && down.type != maze.cellTypes.VerticalWall && down.type != maze.cellTypes.HorizontalWall ) {
-                    bottomEdge = true;
-                }
-
-                if ( (leftEdge || rightEdge) && (topEdge || bottomEdge)   ){
-                   this.corner = true;
-                    if (leftEdge && topEdge) {
-                        this.wallPosition = 'BR';
-                    }
-                    else if (leftEdge && bottomEdge) {
-                        this.wallPosition = 'TR';
-                    }
-                    else if (rightEdge && topEdge) {
-                        this.wallPosition = 'BL';
-                    }
-                    else if (rightEdge && bottomEdge) {
-                        this.wallPosition = 'TL';
-                    }
-                }
-                else {
-
-                    if (this.type ==  maze.cellTypes.HorizontalWall) {
-                        if (topEdge) {
-                            this.wallPosition = 'T';
-                        }
-                        else if (bottomEdge) {
-                            this.wallPosition = 'B';
-                        }
-                    }
-
-                    if (this.type ==  maze.cellTypes.VerticalWall) {
-                        if (leftEdge) {
-                            this.wallPosition = 'L';
-                        }
-                        else if (rightEdge) {
-                            this.wallPosition = 'R';
-                        }
-                    }
-                }
-
-            }    
 
         });
 
@@ -141,7 +80,9 @@ class Cell {
         this.highlighted = highlight;
     }
     getDebugString() {
-       return this.i + "," + this.j + ", " + this.wallPosition;
+        //return this.type;
+        return this.i + "," + this.j;
+        //return this.wallPosition;
     }
     getDebugPosition() {
         return {
@@ -154,7 +95,7 @@ class Cell {
         //if (this.type == "PLAYER") debugger;
         fill(this.color.levels);
         noStroke();
-        textSize(7);
+        textSize(8);
         let position = this.getDebugPosition();
         text(this.getDebugString(), position.x, position.y);
         pop();
@@ -205,77 +146,104 @@ class Cell {
             pop();
         }
 
-       
+
         //Vertical wall
-        if (!this.corner && this.type == maze.cellTypes.VerticalWall) {
+        if (!this.corner && (this.type == maze.cellTypes.VerticalWall || this.type == maze.cellTypes.GhostHouse)) {
             fill(255, 100, 255);
-            //rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
-            stroke(0,0,255);
-           // line(x+w/2, y, x+w/2, y + h/2);
-            //line(x, y+h/2, x + w, y+h/2);
+            //rect(this.i * this.maze.cellSize, this.j * this.maze.cellSize, this.maze.cellSize, this.maze.cellSize);
+            stroke(0, 0, 255);
+            
+            switch (this.wallPosition) {
+                case 'L':
+                    line(x + w / 2, y, x + w / 2, y+h);
+                    break;
+                case 'R':
+                    line(x + w / 2, y, x + w / 2, y+h);
+                    break;
+                case 'T':
+                    //H
+                    line(x, y + h / 2, x + w, y + h / 2);
+                    break;
+                case 'B':
+                    line(x, y + h / 2, x + w, y + h / 2);
+                    break;
+                    case 'Z':
+                        //fill(0,0,255);
+                        //rect(this.i * this.maze.cellSize, this.j * this.maze.cellSize, this.maze.cellSize, this.maze.cellSize);
+
+                    break;
+                default:
+                    break;
+
+            }
+
 
         }
-        
+
         //Horizontal wall
         //!this.corner && 
-        if ( !this.corner && this.type == maze.cellTypes.HorizontalWall) {
-            fill(255, 100, 255);
-            //rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
-            stroke(0,0,255);
-            line(x, y+h/2, x + w, y+h/2);
+        if (!this.corner && this.type == maze.cellTypes.HorizontalWall) {
             
-            
+            //Only draw horizontal lines which are the outside bounds
+            if (this.j == 0 || this.j >= 35){
+                fill(255, 0, 0);
+                //rect(this.i * this.maze.cellSize, this.j * this.maze.cellSize, this.maze.cellSize, this.maze.cellSize);
+                stroke(0, 0, 255);
+                //line(x, y + h / 2, x + w, y + h / 2);
+            }
+
+
         }
-        
-        
+
+
         if (this.corner) {
-             fill(0, 255, 0);
-             //rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
-             stroke(0,0,255);
+            fill(0, 255, 0);
+            //rect(this.i * this.maze.cellSize, this.j * this.maze.cellSize, this.maze.cellSize, this.maze.cellSize);
+            stroke(0, 0, 255);
 
             switch (this.wallPosition) {
                 case 'TL':
                     //H
-                    line(x, y+h/2, x + w/2, y+h/2);
+                    line(x, y + h / 2, x + w / 2, y + h / 2);
                     //V
-                    line(x+w/2, y+h/2, x+w/2, y);
+                    line(x + w / 2, y + h / 2, x + w / 2, y);
                     break;
-            
+
                 case 'TR':
                     //H
-                    line(x+w/2, y+h/2, x + w, y+h/2);
+                    line(x + w / 2, y + h / 2, x + w, y + h / 2);
                     //V
-                    line(x+w/2, y+h/2, x+w/2, y);
+                    line(x + w / 2, y + h / 2, x + w / 2, y);
 
                     break;
-            
+
                 case 'BL':
-                    
-                      //H
-                    line(x, y+h/2, x + w/2, y+h/2);
+
+                    //H
+                    line(x, y + h / 2, x + w / 2, y + h / 2);
                     //V
-                    line(x+w/2, y+h/2, x+w/2, y+h);
+                    line(x + w / 2, y + h / 2, x + w / 2, y + h);
                     break;
-            
+
                 case 'BR':
                     //H
-                    line(x+w/2, y+h/2, x + w, y+h/2);
+                    line(x + w / 2, y + h / 2, x + w, y + h / 2);
                     //V
-                    line(x+w/2, y+h/2, x+w/2, y+h);
+                    line(x + w / 2, y + h / 2, x + w / 2, y + h);
                     break;
-            
+
                 default:
                     break;
             }
 
-             //line(x+this.wallHorizontalOffset, y, x+this.wallHorizontalOffset, y + h);
+            //line(x+this.wallHorizontalOffset, y, x+this.wallHorizontalOffset, y + h);
 
-             //line(x, y+this.wallVerticalOffset, x + w, y+this.wallVerticalOffset);
+            //line(x, y+this.wallVerticalOffset, x + w, y+this.wallVerticalOffset);
 
         }
 
-         //Food
-         if (this.type == maze.cellTypes.Pellet) {
+        //Food
+        if (this.type == maze.cellTypes.Pellet) {
             push();
             fill(255, 255, 255);
             circle((this.i * this.maze.cellSize) + this.maze.cellSize / 2, (this.j * this.maze.cellSize) + this.maze.cellSize / 2, this.maze.cellSize / 12);
@@ -289,8 +257,19 @@ class Cell {
             circle((this.i * this.maze.cellSize) + this.maze.cellSize / 2, (this.j * this.maze.cellSize) + this.maze.cellSize / 2, this.maze.cellSize / 4);
             pop();
         }
-   
 
+
+        //Draw frame
+        if (this.j == 0 ) {
+            stroke(0, 0, 255);
+            line(x, y, x+w, y);
+        }
+        if (this.j == 35 ) {
+            stroke(0, 0, 255);
+            line(x, y+h, x+w, y+h);
+        }
+
+      
     }
 
 
