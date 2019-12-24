@@ -1,4 +1,5 @@
 //TODO Tunnel run
+//TODO Implement restart/reset 
 // TODO Enemy speed....
 //TODO Optimize enemy turn checking - only check at intersections - i.e. not every time in middle of cell with forward backward options
 //TODO Move resources into game class
@@ -61,6 +62,12 @@ function setup() {
     if (winWidth > winHeight) winWidth = winHeight;
     else if (winHeight > winWidth) winHeight = winWidth;
 
+    initGame();
+
+
+}
+
+function initGame(){
     
     game = new Game();
     
@@ -84,8 +91,6 @@ function setup() {
     game.player = player;
     game.maze = maze;
     game.enemies = enemies;
-
-
 }
 
 function drawDebugInfo(){

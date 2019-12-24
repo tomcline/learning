@@ -9,6 +9,7 @@ class Game {
         
         this.keyCodes = {
             D: 68,
+            R: 82,
             SPACEBAR: 32
         }
         
@@ -31,7 +32,9 @@ class Game {
     }
 
 
-
+    if (keyCode == this.keyCodes.R) {
+        initGame();
+    }
 
     //Start game.
     if (!this.started && keyCode == ENTER){
