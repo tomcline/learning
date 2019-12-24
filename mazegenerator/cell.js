@@ -261,14 +261,14 @@ class Cell {
 
 
         //Draw frame
-        if (this.j == 0 ) {
-            stroke(0, 0, 255);
-            line(x, y, x+w, y);
-        }
-        if (this.j == 35 ) {
-            stroke(0, 0, 255);
-            line(x, y+h, x+w, y+h);
-        }
+        // if (this.j == 0 ) {
+        //     stroke(0, 0, 255);
+        //     line(x, y, x+w, y);
+        // }
+        // if (this.j == 35 ) {
+        //     stroke(0, 0, 255);
+        //     line(x, y+h, x+w, y+h);
+        // }
 
       
     }

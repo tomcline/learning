@@ -6,6 +6,7 @@ class Game {
         this.started = false;
         this.debug = false;
         this.paused = false;
+        this.lives = 3;
         
         this.keyCodes = {
             D: 68,
@@ -21,6 +22,30 @@ class Game {
         }
         
         this.enemyMode = this.enemyModes.Chase;
+    }
+
+    drawHeader(){
+
+
+
+        
+    }
+
+    drawFooter(){
+        let gameWidth =  maze.columns*maze.cellSize;
+        let gameHeight =  maze.rows*maze.cellSize;
+       
+
+        for (let i = 0; i < this.lives; i++) {
+            noStroke();
+            fill(color(255, 255, 0));
+            angleMode(DEGREES);  
+            arc((maze.cellSize+maze.cellSize*i), gameHeight-this.maze.cellSize, maze.cellSize, maze.cellSize, 30, 330, PIE);    
+                    
+        }
+
+        
+
     }
 
     handleKeyPress(keyCode) {

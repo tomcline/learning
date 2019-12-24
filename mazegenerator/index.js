@@ -78,12 +78,14 @@ function initGame(){
     
     maze.initialize(map);
     
+    let multiplier = 1;
+
     createCanvas(maze.columns*maze.cellSize, maze.rows*maze.cellSize);
-    player = new Player({i:13,j:26},maze,maze.cellSize,maze.cellSize);
-    inky = new Enemy({i:12,j:17},maze,maze.cellSize,maze.cellSize,'INKY',player);
-    blinky = new Enemy({i:13,j:17},maze,maze.cellSize,maze.cellSize,'BLINKY',player);
-    pinky = new Enemy({i:14,j:17},maze,maze.cellSize,maze.cellSize,'PINKY',player);
-    clyde = new Enemy({i:15,j:17},maze,maze.cellSize,maze.cellSize,'CLYDE',player);
+    player = new Player({i:13,j:26},maze,maze.cellSize*multiplier,maze.cellSize*multiplier);
+    inky = new Enemy({i:12,j:17},maze,maze.cellSize*multiplier,maze.cellSize*multiplier,'INKY',player);
+    blinky = new Enemy({i:13,j:17},maze,maze.cellSize*multiplier,maze.cellSize*multiplier,'BLINKY',player);
+    pinky = new Enemy({i:14,j:17},maze,maze.cellSize*multiplier,maze.cellSize*multiplier,'PINKY',player);
+    clyde = new Enemy({i:15,j:17},maze,maze.cellSize*multiplier,maze.cellSize*multiplier,'CLYDE',player);
     enemies.push(inky);
     enemies.push(blinky);
     enemies.push(pinky);
@@ -165,6 +167,10 @@ function draw() {
              text("PAUSED", width/2, height/2);
              pop();
         }
+
+
+        game.drawFooter();
+        game.drawHeader();
 
 }
 
