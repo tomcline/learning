@@ -115,8 +115,9 @@ class Cell {
         //Ghost door
         if (this.type == maze.cellTypes.GhostDoor) {
             push();
-            fill(100, 50, 100);
-            //rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize,this.maze.cellSize,this.maze.cellSize);
+            fill(255,182,193);
+            rect(this.i * this.maze.cellSize,this.j * this.maze.cellSize + (this.maze.cellSize/2),this.maze.cellSize,this.maze.cellSize/3);
+            rect()
             pop();
         }
 
