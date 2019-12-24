@@ -119,7 +119,7 @@ function chunkArray(myArray, chunk_size){
 
 function draw() {
         
-        background(51);
+        background(25);
 
         maze.draw();    
         

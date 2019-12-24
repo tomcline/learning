@@ -110,18 +110,6 @@ class Maze {
 
         // }
 
-        //Turns off all walls
-        if (disableAllWalls){
-            this.grid.forEach(cell => {
-                    cell.neighbors.forEach (neighbor => {
-                        cell.visitableNeighbors.push(neighbor);
-                });
-    
-                cell.walls.forEach(wall => {
-                    wall.visible = false;
-                });
-            });
-        }
 
     }
 
@@ -159,39 +147,6 @@ class Maze {
     }
     prepareMazeToSolve() {
         this.isInitialized = true;
-    }
-    
-    removeWalls(currentCell, nextCell) {
-        let x = currentCell.i - nextCell.i;
-        let y = currentCell.j - nextCell.j;
-
-            if (x === 1) {
-                currentCell.walls[maze.wallPositions.LEFT].visible = false;
-                nextCell.walls[maze.WallPositions.RIGHT].visible = false;
-                currentCell.visitableNeighbors.push(nextCell);
-                nextCell.visitableNeighbors.push(currentCell);
-
-            } else if (x === -1) {
-                currentCell.walls[maze.wallPositions.RIGHT].visible = false;
-                nextCell.walls[maze.wallPositions.LEFT].visible = false;
-                currentCell.visitableNeighbors.push(nextCell);
-                nextCell.visitableNeighbors.push(currentCell);
-                 
-            }
-            
-    
-            if (y === 1) {
-                currentCell.walls[maze.WwllPositions.TOP].visible = false;
-                nextCell.walls[maze.wallPositions.BOTTOM].visible = false;
-                currentCell.visitableNeighbors.push(nextCell);
-                nextCell.visitableNeighbors.push(currentCell);
-            } else if (y === -1) {
-                currentCell.walls[maze.wallPositions.BOTTOM].visible = false;
-                nextCell.walls[maze.wallPositions.TOP].visible = false;
-                currentCell.visitableNeighbors.push(nextCell);
-                nextCell.visitableNeighbors.push(currentCell);
-            }
-           
-    }
+    }    
 
 }
