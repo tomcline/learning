@@ -31,7 +31,6 @@ let gameSounds = {
 }
 
 
-let map = mapgen();
 
 //P5 js key handler.
 function keyPressed() {
@@ -40,6 +39,7 @@ function keyPressed() {
 
 
 function preload() {
+
 
     gameSounds.intro = loadSound('sounds/pacman_beginning.wav');
     gameSounds.pacChomp = loadSound('sounds/pacman_chomp.wav');
@@ -76,7 +76,7 @@ function initGame(){
     
     maze = new Maze();
     
-    maze.initialize(map);
+    maze.initialize();
     
     let multiplier = 1;
 
@@ -149,28 +149,7 @@ function draw() {
             drawDebugInfo();
         }
         
-
-        if (!game.started) {
-            push();
-            textSize(width*.1);
-            fill(235,255,0);
-            textAlign(CENTER, CENTER);
-             text("ENTER TO START", width/2, height/2);
-             pop();
-        }
-
-        if (game.paused) {
-            push();
-            textSize(width*.1);
-            fill(235,255,0);
-            textAlign(CENTER, CENTER);
-             text("PAUSED", width/2, height/2);
-             pop();
-        }
-
-
-        game.drawFooter();
-        game.drawHeader();
+        game.show();
 
 }
 

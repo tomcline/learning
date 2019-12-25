@@ -8,8 +8,7 @@ class Enemy extends Player {
         let origin = maze.getCell(this.i, this.j);
         let target = maze.getCell(player.i, player.j);
 
-        this.x = (startPosition.i * maze.cellSize) + (maze.cellSize / 2);
-        this.y = (startPosition.j * maze.cellSize) + (maze.cellSize / 2);
+        
         
         this.type = 'ENEMY';
         this.speed = 0;
@@ -34,7 +33,23 @@ class Enemy extends Player {
 
 
     }
+    reset(){
+        this.currentPath = [];
+        this.mode = game.enemyModes.Wait;
+        this.modePrevious = game.enemyModes.Wait;
+        this.isScared = false;
+        this.isBlinking = false;
+        this.previousMovement = {
+            x: 0,
+            y: 0
+        }
 
+        this.moveToStartingPosition();
+    }
+    moveToStartingPosition(){
+        this.x = (this.startPosition.i * maze.cellSize) + (maze.cellSize / 2);
+        this.y = (this.startPosition.j * maze.cellSize) + (maze.cellSize / 2);
+    }
     initializeEnemyType(enemyName) {
         if (this.enemyName == 'INKY') {
             this.color = color(0, 255, 255);

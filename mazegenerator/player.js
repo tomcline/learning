@@ -1,5 +1,5 @@
 class Player extends Cell {
-    constructor(startPosition,maze, height, width) {
+    constructor(startPosition, maze, height, width) {
 
         let i, j, w, h, tempCell;
 
@@ -9,10 +9,8 @@ class Player extends Cell {
 
         super(startPosition.i, startPosition.j, w, h, maze);
 
-        //Start in middle of start cell region.
-        this.x = ((startPosition.i * maze.cellSize) + (maze.cellSize / 2)) + (maze.cellSize / 2);
-        this.y = (startPosition.j * maze.cellSize) + (maze.cellSize / 2);
-        
+       
+
         this.startPosition = startPosition;
         this.type = 'PLAYER';
         this.color = color(255, 255, 0);
@@ -22,7 +20,22 @@ class Player extends Cell {
         this.speed = 1;
         this.mouthAngle = 0;
         this.mouthOpening = true;
+        
+        this.moveToStartingPosition();
 
+    }
+    moveToStartingPosition(){
+         //Start in middle of start cell region.
+         this.x = ((this.startPosition.i * maze.cellSize) + (maze.cellSize / 2)) + (maze.cellSize / 2);
+         this.y = (this.startPosition.j * maze.cellSize) + (maze.cellSize / 2);
+    }
+    reset(){
+        this.isMoving = false;
+        this.mouthAngle = 0;
+        this.mouthOpening = true;
+        this.desiredMovementDirection = null;
+        this.currentMovementDirection = null;
+        this.moveToStartingPosition();
     }
     handleKeyPress(keyCode) {
 
@@ -137,8 +150,8 @@ class Player extends Cell {
 
         player.isMoving = true;
 
-        if ( player.isMoving  && !gameSounds.pacSiren.isPlaying() ){
-            gameSounds.pacSiren.loop(0,1,.5);
+        if (player.isMoving && !gameSounds.pacSiren.isPlaying()) {
+            gameSounds.pacSiren.loop(0, 1, .5);
         }
 
         let didMove = false;
@@ -184,9 +197,45 @@ class Player extends Cell {
     }
 
     eat(cell) {
-        cell.type = maze.cellTypes.EmptySpace;
-        gameSounds.pacChomp.stop();
-        gameSounds.pacChomp.play();
+
+        let points = 0;
+        /*
+         Pac-Dot = 10 Pts
+        Power Pellet = 50 Pts
+        1st Ghost = 200 Pts
+        2nd Ghost = 400 Pts
+        3rd Ghost = 800 Pts
+        4th Ghost = 1600 Pts
+        Cherry = 100 Pts
+        Strawberry = 300 Pts
+        Orange = 500 Pts
+        Apple = 700 Pts
+        Melon = 1000 Pts
+        Galaxian = 2000 Pts
+        Bell = 3000 Pts
+        Key = 5000 Pts
+      */
+
+        switch (cell.type) {
+            case maze.cellTypes.Pellet:
+                points = 10;
+                cell.type = maze.cellTypes.EmptySpace;
+                gameSounds.pacChomp.stop();
+                gameSounds.pacChomp.play();
+                break;
+            case maze.cellTypes.PowerPellet:
+                points = 50;
+                cell.type = maze.cellTypes.EmptySpace;
+                gameSounds.pacChomp.stop();
+                gameSounds.pacChomp.play();
+                break;
+
+            default:
+                break;
+        }
+
+        game.updateScore(points);
+
     }
     moveMouth() {
 
@@ -235,6 +284,27 @@ class Player extends Cell {
         }
         return rotationAngle;
     }
+    getCurrentCell(){
+        return this.maze.getCell(this.i, this.j);
+    }
+    checkPlayerState(mazeCell){
+        
+        enemies.forEach(enemy => {
+            if (player.getCurrentCell() == enemy.getCurrentCell() )
+            {
+                player.wasHit();
+                return;
+            }
+        });
+
+        if ((mazeCell.type == maze.cellTypes.Pellet || mazeCell.type == maze.cellTypes.PowerPellet)) {
+            this.eat(mazeCell);
+        }
+    }
+    wasHit(){
+        gameSounds.pacDeath.play();
+        game.playerWasHit();
+    }
     show() {
 
         let rotationAngle = this.determineRotationAngle();
@@ -259,10 +329,8 @@ class Player extends Cell {
 
 
         let mazeCell = this.maze.getCell(this.i, this.j);
-
-        if (mazeCell.type == maze.cellTypes.Pellet || mazeCell.type == maze.cellTypes.PowerPellet) {
-            this.eat(mazeCell);
-        }
+        this.checkPlayerState(mazeCell);
+        
 
     }
 }

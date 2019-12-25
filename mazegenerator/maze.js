@@ -41,12 +41,13 @@ class Maze {
     addCell(cell) {
         this.grid.push(cell);
     }
-    reset() {
-        maze = new Maze(width, height);
-        maze.initialize(width, height);
-        maze.buildMaze();
+    createMap(){
+        //return mapgen();
     }
     initialize(map) {
+        if (!map) {
+            map = mapgen();
+        }
         let cols = map[0].length;
         let rows = map.length;
         this.grid = [];
@@ -109,9 +110,7 @@ class Maze {
                     } else if (rightEdge && bottomEdge) {
                         cell.wallPosition = 'TL';
                     }
-                    if (cell.type == maze.cellTypes.GhostHouse) {
-                        debugger;
-                    }
+                    
                 } else {
 
                     if (topEdge) {

@@ -7,6 +7,8 @@ class Game {
         this.debug = false;
         this.paused = false;
         this.lives = 3;
+        this.score = 0;
+        this.highScore = 0;
         
         this.keyCodes = {
             D: 68,
@@ -25,10 +27,28 @@ class Game {
     }
 
     drawHeader(){
+        let gameWidth =  maze.columns*maze.cellSize;
 
+        push();
+        //if (this.type == "PLAYER") debugger;
+        fill(255,255,255);
+        noStroke();
+        textSize(20);
+        textFont("PressStart");
 
-
+        textAlign(CENTER, CENTER);
         
+        text(this.score,100 , this.maze.cellSize*2.25);
+
+        text("HIGH SCORE",gameWidth/2 , this.maze.cellSize*1.15);
+
+        text(this.highScore,gameWidth/2 , this.maze.cellSize*2.25);
+
+
+        pop();
+
+
+
     }
 
     drawFooter(){
@@ -36,15 +56,12 @@ class Game {
         let gameHeight =  maze.rows*maze.cellSize;
        
 
-        for (let i = 0; i < this.lives; i++) {
+        for (let i = 1; i < this.lives; i++) {
             noStroke();
             fill(color(255, 255, 0));
             angleMode(DEGREES);  
             arc((maze.cellSize+maze.cellSize*i), gameHeight-this.maze.cellSize, maze.cellSize, maze.cellSize, 30, 330, PIE);    
-                    
         }
-
-        
 
     }
 
@@ -58,7 +75,7 @@ class Game {
 
 
     if (keyCode == this.keyCodes.R) {
-        initGame();
+        this.gameOver();
     }
 
     //Start game.
@@ -75,20 +92,78 @@ class Game {
        this.player.handleKeyPress(keyCode);
     }
 
-    //SPACE BAR
-    if (this.started && keyCode == this.keyCodes.SPACEBAR) {
-        this.paused = !this.paused;
-        if (game.paused) {
-            this.enemies.forEach(enemy => {
-                enemy.modePrevious = enemy.mode;
-                enemy.mode = this.enemyModes.Wait;
-            });
-        }
-        else {
-            this.enemies.forEach(enemy => {
-                enemy.mode = enemy.modePrevious;
-            });
+        //SPACE BAR
+        if (this.started && keyCode == this.keyCodes.SPACEBAR) {
+            this.paused = !this.paused;
+            if (game.paused) {
+                this.enemies.forEach(enemy => {
+                    enemy.modePrevious = enemy.mode;
+                    enemy.mode = this.enemyModes.Wait;
+                });
+            }
+            else {
+                this.enemies.forEach(enemy => {
+                    enemy.mode = enemy.modePrevious;
+                });
+            }
         }
     }
+    updateScore(points){
+
+        this.score+=points;
+
+        if (this.score >= this.highScore) {
+            this.highScore = this.score;
+        }
+
+    
+    }
+    playerWasHit(){
+        this.lives--;
+        if (this.lives<=0) {
+            this.gameOver();
+        }
+        this.resetToStartingPositions();
+    }
+    resetToStartingPositions(){
+        player.reset();
+        enemies.forEach(enemy => {
+            enemy.reset();
+        });
+        this.started = false;
+    }
+    gameOver(){
+        maze.isInitialized = false;
+        game.started = false;
+        this.score = 0;
+        this.lives = 3;
+        this.resetToStartingPositions();
+        maze.initialize(mapgen());
+    }
+    show(){
+        
+        if (!this.started) {
+            push();
+            textSize(30);
+            fill(235,255,0);
+            textAlign(CENTER, TOP);
+            textFont("PressStart");
+             text("ENTER TO START", width/2, height/2);
+             pop();
+        }
+
+        if (this.paused) {
+            push();
+            textSize(30);
+            fill(235,255,0);
+            textAlign(CENTER, TOP);
+            textFont("PressStart");
+             text("PAUSED", width/2, height/2);
+             pop();
+        }
+
+
+        game.drawFooter();
+        game.drawHeader();
     }
 }

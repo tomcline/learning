@@ -21,19 +21,8 @@ var randomElement = function(list) {
     }
 };
 
-var UP = 0;
-var RIGHT = 1;
-var DOWN = 2;
-var LEFT = 3;
 
-var cells = [];
-var tallRows = [];
-var narrowCols = [];
-
-var rows = 9;
-var cols = 5;
-
-var reset = function() {
+var reset = function(UP,RIGHT,DOWN,LEFT,cells,tallRows,narrowCols,rows,cols) {
     var i;
     var c;
 
@@ -86,7 +75,7 @@ var reset = function() {
     c.connect[UP] = c.connect[LEFT] = true;
 };
 
-var genRandom = function() {
+var genRandom = function(UP,RIGHT,DOWN,LEFT,cells,tallRows,narrowCols,rows,cols) {
 
     var getLeftMostEmptyCells = function() {
         var x;
@@ -944,7 +933,7 @@ var genRandom = function() {
     // try to generate a valid map, and keep count of tries.
     var genCount = 0;
     while (true) {
-        reset();
+        reset(UP,RIGHT,DOWN,LEFT,cells,tallRows,narrowCols,rows,cols);
         gen();
         genCount++;
         if (!isDesirable()) {
@@ -963,7 +952,7 @@ var genRandom = function() {
 };
 
 // Transform the simple cells to a tile array used for creating the map.
-var getTiles = function() {
+var getTiles = function(UP,RIGHT,DOWN,LEFT,cells,tallRows,narrowCols,rows,cols) {
 
     var tiles = []; // each is a character indicating a wall(|), path(.), or blank(_).
     var tileCells = []; // maps each tile to a specific cell of our simple map
@@ -1440,7 +1429,7 @@ var drawTiles = function(ctx,left,top,size) {
 
     // draw tiles
 
-    var tiles = getTiles();
+    var tiles = getTiles(UP,RIGHT,DOWN,LEFT,cells,tallRows,narrowCols,rows,cols);
 
     fillStyles = {
         '.' : 'rgba(0,0,0,0.4)',
@@ -1463,15 +1452,49 @@ var drawTiles = function(ctx,left,top,size) {
     ctx.restore();
 };
 
+
+
+
+function chunkArray(myArray, chunk_size){
+    var index = 0;
+    var arrayLength = myArray.length;
+    var tempArray = [];
+    
+    for (index = 0; index < arrayLength; index += chunk_size) {
+        myChunk = myArray.slice(index, index+chunk_size);
+        // Do something if you want with the group
+        tempArray.push(myChunk);
+    }
+
+    return tempArray;
+}
+
+
 var mapgen = function() {
-    genRandom();
+        
+
+
+    var UP = 0;
+    var RIGHT = 1;
+    var DOWN = 2;
+    var LEFT = 3;
+    
+    var cells = [];
+    var tallRows = [];
+    var narrowCols = [];
+    
+    var rows = 9;
+    var cols = 5;
+
+
+    genRandom(UP,RIGHT,DOWN,LEFT,cells,tallRows,narrowCols,rows,cols);
     // var map = new Map(28,36,getTiles());
     // map.name = "";
     // map.wallFillColor = randomColor();
     // map.wallStrokeColor = rgbString(hslToRgb(Math.random(), Math.random(), Math.random() * 0.4 + 0.6));
     // map.pelletColor = "#ffb8ae";
     // return map;
-    let table = getTiles().split("");
+    let table = getTiles(UP,RIGHT,DOWN,LEFT,cells,tallRows,narrowCols,rows,cols).split("");
     table = chunkArray(table,28);
     //28,36 - row-col
 // size of a square tile in pixels
