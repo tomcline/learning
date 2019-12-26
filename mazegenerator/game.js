@@ -139,6 +139,7 @@ class Game {
         this.lives = 3;
         this.resetToStartingPositions();
         gameSounds.pacSiren.stop();
+        gameSounds.intro.stop();
         gameSounds.intro.play();
         maze.initialize(mapgen());
     }

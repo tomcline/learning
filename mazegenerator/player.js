@@ -287,13 +287,13 @@ class Player extends Cell {
     }
     checkPlayerState(mazeCell){
         
-        enemies.forEach(enemy => {
+        for (let enemy of enemies) {
             if (player.getCurrentCell() == enemy.getCurrentCell() )
             {
                 player.wasHit();
-                return;
+                break;
             }
-        });
+        };
 
         if ((mazeCell.type == maze.cellTypes.Pellet || mazeCell.type == maze.cellTypes.PowerPellet)) {
             this.eat(mazeCell);
