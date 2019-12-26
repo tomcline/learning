@@ -130,11 +130,18 @@ function draw() {
         background(25);
 
         maze.draw();    
-        
-        
+                
+
         if (!game.paused) {
             player.move();
+            if (!gameSounds.pacSiren.isPlaying()) {
+                gameSounds.pacSiren.loop(0, 1, .5);
+            }
         }
+                else {
+                    gameSounds.pacSiren.stop();
+                }
+        
         
         player.show();      
         

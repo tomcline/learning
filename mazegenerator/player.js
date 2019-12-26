@@ -150,9 +150,7 @@ class Player extends Cell {
 
         player.isMoving = true;
 
-        if (player.isMoving && !gameSounds.pacSiren.isPlaying()) {
-            gameSounds.pacSiren.loop(0, 1, .5);
-        }
+        
 
         let didMove = false;
         //Not changing direction, attempt to move to desired direction
