@@ -131,16 +131,15 @@ function draw() {
 
         maze.draw();    
                 
-
         if (!game.paused) {
             player.move();
             if (!gameSounds.pacSiren.isPlaying()) {
                 gameSounds.pacSiren.loop(0, 1, .5);
             }
+            else {
+                //  gameSounds.pacSiren.stop();
+            }
         }
-                else {
-                    gameSounds.pacSiren.stop();
-                }
         
         
         player.show();      

@@ -138,6 +138,8 @@ class Game {
         this.score = 0;
         this.lives = 3;
         this.resetToStartingPositions();
+        gameSounds.pacSiren.stop();
+        gameSounds.intro.play();
         maze.initialize(mapgen());
     }
     show(){
