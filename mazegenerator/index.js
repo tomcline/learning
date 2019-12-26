@@ -1,11 +1,9 @@
-//TODO Tunnel run
 //TODO Enemies can still turn
 // TODO Enemy speed....
 //TODO Optimize enemy turn checking - only check at intersections - i.e. not every time in middle of cell with forward backward options
 //TODO Move resources into game class
 //https://gameinternals.com/understanding-pac-man-ghost-behavior
 // TODO Player enemy collisions
-//TODO Keep Score
 // DONE New map generation? https://github.com/shaunlebron/pacman-mazegen
 //https://github.com/shaunlebron/pacman-mazegen/blob/gh-pages/tetris/Map.js
 // FIXME Player warps through walls and gets out of sync

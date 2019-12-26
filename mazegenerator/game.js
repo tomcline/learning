@@ -8,6 +8,9 @@ class Game {
         this.paused = false;
         this.lives = 3;
         this.score = 0;
+        this.level = 1;
+        this.dotsToEat = 0;
+        this.dotsEaten = 0;
         this.highScore = 0;
         
         this.keyCodes = {
@@ -44,10 +47,11 @@ class Game {
 
         text(this.highScore,gameWidth/2 , this.maze.cellSize*2.25);
 
+        if (game.debug) {
+            text(this.level + " " + this.dotsEaten + " " +this.dotsToEat ,gameWidth-100 , this.maze.cellSize*2.25);
+        }
 
         pop();
-
-
 
     }
 
@@ -116,7 +120,22 @@ class Game {
             this.highScore = this.score;
         }
 
+        //Extra life after 10,0000 points on level 1
+        if (this.level == 1 && this.score % 10000 == 0) {
+            this.lives++;
+        }
+
     
+    }
+    levelComplete(){
+        this.level++;
+        this.dotsEaten = 0;
+        this.dotsToEat = 0;
+        maze.replayCurrentMap();
+        this.resetToStartingPositions();
+    }
+    dotWasEaten(){
+        this.dotsEaten++;
     }
     playerWasHit(){
         this.lives--;
@@ -137,11 +156,14 @@ class Game {
         game.started = false;
         this.score = 0;
         this.lives = 3;
+        this.level = 1;
+        this.dotsToEat = 0;
+        this.dotsEaten = 0;
         this.resetToStartingPositions();
         gameSounds.pacSiren.stop();
         gameSounds.intro.stop();
         gameSounds.intro.play();
-        maze.initialize(mapgen());
+        maze.newLevel();
     }
     show(){
         
@@ -168,5 +190,11 @@ class Game {
 
         game.drawFooter();
         game.drawHeader();
+
+
+        if (this.dotsEaten == this.dotsToEat){
+            this.levelComplete();
+        }
+
     }
 }

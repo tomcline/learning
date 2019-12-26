@@ -112,6 +112,12 @@ class Player extends Cell {
         let currentCell;
 
         currentCell = this.maze.getCell(this.i, this.j);
+
+        //Don't let player in ghost house.
+        if (newPosition.type ==  maze.cellTypes.GhostDoor) {
+            return false;
+        }
+
         return currentCell.visitableNeighbors.includes(newPosition);
 
     }
@@ -138,7 +144,10 @@ class Player extends Cell {
     }
     moveInDirection(direction, forceMove) {
         let directionPosition = this.determineNewDirectionPosition(direction);
-        let canMoveInDirection = this.canMoveTo(this.getNewPosition(directionPosition));
+        let newDesiredPosition = this.getNewPosition(directionPosition);
+        let canMoveInDirection = this.canMoveTo(newDesiredPosition);
+
+
         if (canMoveInDirection || forceMove) {
             this.x += directionPosition.x;
             this.y += directionPosition.y;
@@ -182,6 +191,25 @@ class Player extends Cell {
             //If not in the center, keep moving.
             else if (!this.isInMiddleOfCell(this.maze.getCell(this.i, this.j))) {
                 this.moveInDirection(this.currentMovementDirection, true);
+                
+            }
+            else {
+                //Unable to make any further moves
+                //See if we are at end of tunnel
+                //If so, warp
+                let currentCell = this.maze.getCell(this.i, this.j);
+                if (currentCell.type == currentCell.maze.cellTypes.Tunnel){
+                    let gameWidth =  maze.columns*maze.cellSize;
+                    let newX = 0;
+                    //If warping left, set to other side
+                    //Otherwise, warps to right
+                    if (this.currentMovementDirection == LEFT_ARROW) {
+                        newX = gameWidth;
+                    }
+                    this.x = newX;
+                    this.y = this.y;
+
+                }
             }
         }
 
@@ -220,12 +248,14 @@ class Player extends Cell {
                 cell.type = maze.cellTypes.EmptySpace;
                 gameSounds.pacChomp.stop();
                 gameSounds.pacChomp.play();
+                game.dotWasEaten();
                 break;
             case maze.cellTypes.PowerPellet:
                 points = 50;
                 cell.type = maze.cellTypes.EmptySpace;
                 gameSounds.pacChomp.stop();
                 gameSounds.pacChomp.play();
+                game.dotWasEaten();
                 break;
 
             default:

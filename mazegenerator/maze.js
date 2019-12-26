@@ -9,7 +9,7 @@ class Maze {
         this.stack = [];
         this.cellSize = 20;
         this.currentCell = null;
-        
+        this.map = null;
 
         this.cellTypes = {
             VerticalWall: '|',
@@ -48,6 +48,7 @@ class Maze {
         if (!map) {
             map = mapgen();
         }
+        this.map = map;
         let cols = map[0].length;
         let rows = map.length;
         this.grid = [];
@@ -65,8 +66,13 @@ class Maze {
             let maze = cell.maze;
 
 
+            //Keep track of how many dots are on gameboard
+            if (cell.type == maze.cellTypes.Pellet || cell.type == maze.cellTypes.PowerPellet) {
+                game.dotsToEat++;
+            }
+
             //Brute force ghost house
-            if (cell.type == cell.maze.cellTypes.GhostHouse) {
+            if (cell.type == maze.cellTypes.GhostHouse) {
                 if (cell.i == 11 && cell.j == 16) {
                     cell.wallPosition = 'TT';
                 }
@@ -177,6 +183,14 @@ class Maze {
             cell.highlight(false);
         });
 
+    }
+    newLevel(){
+        this.map = null;
+        this.initialize();
+    }
+    replayCurrentMap(){
+        //
+        this.initialize(this.map);
     }
     resetCellValues(){
 
