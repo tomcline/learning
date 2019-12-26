@@ -7,7 +7,7 @@ class Game {
         this.debug = false;
         this.paused = false;
         this.lives = 3;
-        this.score = 9999;
+        this.score = 0;
         this.level = 1;
         this.dotsToEat = 0;
         this.dotsEaten = 0;

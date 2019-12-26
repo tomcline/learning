@@ -1,5 +1,5 @@
 //TODO Enemies can still CHANGE DIRECTION
-// TODO Enemy speed....
+// TODO Proper speed on movements, eating, etc.
 //TODO Implement scatter chase wave logic - https://gameinternals.com/understanding-pac-man-ghost-behavior
 //TODO Optimize enemy turn checking - only check at intersections - i.e. not every time in middle of cell with forward backward options
 //TODO Move resources into game class
