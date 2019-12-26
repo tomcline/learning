@@ -1,8 +1,10 @@
-//TODO Enemies can still turn
+//TODO Enemies can still CHANGE DIRECTION
 // TODO Enemy speed....
+//TODO Implement scatter chase wave logic - https://gameinternals.com/understanding-pac-man-ghost-behavior
 //TODO Optimize enemy turn checking - only check at intersections - i.e. not every time in middle of cell with forward backward options
 //TODO Move resources into game class
 //https://gameinternals.com/understanding-pac-man-ghost-behavior
+//http://www.designoriented.net/blog/tag/pac-man/
 // TODO Player enemy collisions
 // DONE New map generation? https://github.com/shaunlebron/pacman-mazegen
 //https://github.com/shaunlebron/pacman-mazegen/blob/gh-pages/tetris/Map.js

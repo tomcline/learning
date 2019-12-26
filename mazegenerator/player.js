@@ -256,6 +256,8 @@ class Player extends Cell {
                 gameSounds.pacChomp.stop();
                 gameSounds.pacChomp.play();
                 game.dotWasEaten();
+                //Pellett eaten, trigger frightened mode.
+                game.enterFrightenedMode();
                 break;
 
             default:
@@ -320,7 +322,12 @@ class Player extends Cell {
         for (let enemy of enemies) {
             if (player.getCurrentCell() == enemy.getCurrentCell() )
             {
-                player.wasHit();
+                if (enemy.mode != game.enemyModes.Frightened) {
+                    player.wasHit();
+                }
+                else {
+                    game.enemyEaten(enemy);
+                }
                 break;
             }
         };

@@ -1,15 +1,15 @@
 class Enemy extends Player {
-    constructor(startPosition,maze, height, width, enemyName, player) {
-        
-        
-        super(startPosition,maze, height, width);
-        
-        
+    constructor(startPosition, maze, height, width, enemyName, player) {
+
+
+        super(startPosition, maze, height, width);
+
+
         let origin = maze.getCell(this.i, this.j);
         let target = maze.getCell(player.i, player.j);
 
-        
-        
+
+
         this.type = 'ENEMY';
         this.speed = 0;
         this.enemyIndex = -1;
@@ -33,10 +33,10 @@ class Enemy extends Player {
 
 
     }
-    reset(){
+    reset() {
         this.currentPath = [];
-        this.mode = game.enemyModes.Wait;
-        this.modePrevious = game.enemyModes.Wait;
+        this.mode = this.modePrevious;
+        this.modePrevious = this.modePrevious;
         this.isScared = false;
         this.isBlinking = false;
         this.previousMovement = {
@@ -46,7 +46,7 @@ class Enemy extends Player {
 
         this.moveToStartingPosition();
     }
-    moveToStartingPosition(){
+    moveToStartingPosition() {
         this.x = (this.startPosition.i * maze.cellSize) + (maze.cellSize / 2);
         this.y = (this.startPosition.j * maze.cellSize) + (maze.cellSize / 2);
     }
@@ -88,7 +88,7 @@ class Enemy extends Player {
         //If we are in the middle of a cell we may have a choice to make
         //Otherwise, carry on in previous directions
         let cell = this.maze.getCell(this.i, this.j);
-        
+
         if (this.isInMiddleOfCell()) {
             //Get cell of current position.
             //See if we have multiple routes to take.
@@ -128,44 +128,42 @@ class Enemy extends Player {
                     y: jDiff
                 }
 
-            }
-            else {
+            } else {
                 //If best path would reverse our direction,
                 //Pick a different neighbor
                 //Or, attempt to continue in current path
-                let bestCell =  this.maze.getCell(newPosition.i, newPosition.j);
+                let bestCell = this.maze.getCell(newPosition.i, newPosition.j);
                 let possibleRoutes = cell.visitableNeighbors.filter(item => item !== bestCell);
                 if (possibleRoutes.length > 0) {
                     //Randomly select route - not how OG pacman does it...
-                    let randomDirection = floor(random(0,possibleRoutes.length-1));
+                    let randomDirection = floor(random(0, possibleRoutes.length - 1));
                     directionPosition = {
                         x: possibleRoutes[randomDirection].i - this.i,
                         y: possibleRoutes[randomDirection].j - this.j
                     }
-                }
-                else {
-                        //Force direction reversal
-                        let newX = 0;
-                        let newY = 0;
+                } else {
+                    //Force direction reversal
+                    let newX = 0;
+                    let newY = 0;
 
-                        if (this.previousMovement.x != 0) {
-                            newX = this.previousMovement.x * -1;
-                        }
+                    if (this.previousMovement.x != 0) {
+                        newX = this.previousMovement.x * -1;
+                    }
 
-                        if (this.previousMovement.y != 0) {
-                            newY = this.previousMovement.y * -1;
-                        }
+                    if (this.previousMovement.y != 0) {
+                        newY = this.previousMovement.y * -1;
+                    }
 
-                        directionPosition = {
-                            x: newX,
-                            y: newY
-                        }
+                    directionPosition = {
+                        x: newX,
+                        y: newY
+                    }
 
-                        console.warn(this.enemyName,directionPosition, "Cant go anywhere because maze is dumb... Prevent this in the future but allow for now.");
+                    console.warn(this.enemyName, directionPosition, "Cant go anywhere because maze is dumb... Prevent this in the future but allow for now.");
                 }
             }
         } else {
-           directionPosition = {
+            directionPosition = {
                 x: this.previousMovement.x,
                 y: this.previousMovement.y
             }
@@ -177,14 +175,9 @@ class Enemy extends Player {
         }
 
     }
-
-    calculateNewPosition(player, maze, solver) {
-
+    chase(){
         let newPosition;
-        this.maze.resetCellValues();
 
-        switch (this.mode) {
-            case game.enemyModes.Chase:
                 //Blinky - Target Pacman
                 //Pinky - Target 4 tiles in front of current direction
                 //Inky - 2 tiles in front of Pac man, with a vector from Blinky to that position, doubled.
@@ -249,12 +242,23 @@ class Enemy extends Player {
                 this.currentPath = solver.pathSolution;
                 newPosition = solver.pathSolution[solver.pathSolution.length - 2];
                 solver.reset();
+
+                return newPosition;
+    }
+    calculateNewPosition(player, maze, solver) {
+
+        let newPosition;
+        this.maze.resetCellValues();
+
+        switch (this.mode) {
+            case game.enemyModes.Chase:
+                newPosition = this.chase();
                 break;
             case game.enemyModes.Scatter:
 
                 break;
             case game.enemyModes.Frightened:
-
+                newPosition = this.chase();
                 break;
 
             default:
@@ -274,43 +278,43 @@ class Enemy extends Player {
 
     move(directionPosition) {
 
-                
-                    this.previousMovement = {
-                        x: directionPosition.x,
-                        y: directionPosition.y
-                    };
 
-                    this.x += directionPosition.x;
-                    this.y += directionPosition.y;
+        this.previousMovement = {
+            x: directionPosition.x,
+            y: directionPosition.y
+        };
 
-                    //Update i and j position.
-                    let normalizedPosition = this.normalizePosition();
-                    this.i = normalizedPosition.i;
-                    this.j = normalizedPosition.j;
+        this.x += directionPosition.x;
+        this.y += directionPosition.y;
 
+        //Update i and j position.
+        let normalizedPosition = this.normalizePosition();
+        this.i = normalizedPosition.i;
+        this.j = normalizedPosition.j;
 
-        }
-        show() {
-
-            if (frameCount % 15 == 0) {
-                this.switchImage();
-            }
-
-            push();
-            //Thanks to human on the interwebz for building the enemy sprite.
-            var ghostIndex = this.isScared ? 4 : this.enemyIndex; // the vert ghost image
-            var imageIndex = this.isBlinking ? 2 : this.imageIndex; // horiz image
-
-
-            //image(ghosties_img, this.i*maze.cellSize, this.j*maze.cellSize, this.w, this.h, (42 * imageIndex), 43 * ghostIndex, 45, 45);
-            image(ghosties_img, this.x - this.w / 2, this.y - this.h / 2, this.w, this.h, (42 * imageIndex), 43 * ghostIndex, 45, 45);
-
-            pop();
-
-
-
-
-
-        }
 
     }
+    show() {
+
+        if (frameCount % 15 == 0) {
+            this.switchImage();
+        }
+
+        push();
+        //Thanks to human on the interwebz for building the enemy sprite.
+        var ghostIndex = this.isScared ? 4 : this.enemyIndex; // the vert ghost image
+        var imageIndex = this.isBlinking ? 2 : this.imageIndex; // horiz image
+
+
+        //image(ghosties_img, this.i*maze.cellSize, this.j*maze.cellSize, this.w, this.h, (42 * imageIndex), 43 * ghostIndex, 45, 45);
+        image(ghosties_img, this.x - this.w / 2, this.y - this.h / 2, this.w, this.h, (42 * imageIndex), 43 * ghostIndex, 45, 45);
+
+        pop();
+
+
+
+
+
+    }
+
+}

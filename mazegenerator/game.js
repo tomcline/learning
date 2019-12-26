@@ -7,12 +7,15 @@ class Game {
         this.debug = false;
         this.paused = false;
         this.lives = 3;
-        this.score = 0;
+        this.score = 9999;
         this.level = 1;
         this.dotsToEat = 0;
         this.dotsEaten = 0;
         this.highScore = 0;
-        
+        this.frightTime = 6;
+        this.frightTimeStarted = 0;
+        this.extraLifeGiven = false;
+        this.ghostsEaten = 0;
         this.keyCodes = {
             D: 68,
             R: 82,
@@ -100,15 +103,11 @@ class Game {
         if (this.started && keyCode == this.keyCodes.SPACEBAR) {
             this.paused = !this.paused;
             if (game.paused) {
-                this.enemies.forEach(enemy => {
-                    enemy.modePrevious = enemy.mode;
-                    enemy.mode = this.enemyModes.Wait;
-                });
+                this.setEnemyMode(this.enemyModes.Wait);
+                
             }
             else {
-                this.enemies.forEach(enemy => {
-                    enemy.mode = enemy.modePrevious;
-                });
+                this.returnEnemyToPreviousMode();
             }
         }
     }
@@ -121,11 +120,55 @@ class Game {
         }
 
         //Extra life after 10,0000 points on level 1
-        if (this.level == 1 && this.score % 10000 == 0) {
+        if (this.level == 1 && !this.extraLifeGiven && this.score >= 10000) {
             this.lives++;
+            this.extraLifeGiven = true;
+            gameSounds.pacExtraPac.play();
         }
 
     
+    }
+    enterFrightenedMode(){
+        this.setEnemyMode(this.enemyModes.Frightened);
+
+        if (this.level < 19) {
+            this.frightTime = 6;
+            this.frightTimeStarted = millis();
+        }
+
+        //TODO Start frightened timer and then handle blinking back to normal
+    }
+    exitFrightenedMode(){
+        this.frightTimeStarted = 0;
+        this.ghostsEaten = 0;
+        this.returnEnemyToPreviousMode();
+    }
+    enemyEaten(enemy){
+        this.ghostsEaten++;
+        this.updateScore(this.ghostsEaten*200);
+        enemy.reset();
+        gameSounds.pacEatGhost.play();
+    }
+    setEnemyMode(mode){
+        enemies.forEach(enemy => {
+            if (!mode) {
+                enemy.mode = enemy.modePrevious;
+            }
+            else {
+                enemy.modePrevious = enemy.mode;
+                enemy.mode = mode;
+            }
+            if (enemy.mode == this.enemyModes.Frightened) {
+                enemy.isScared = true;
+            }
+            else {
+                enemy.isScared = false;
+            }
+        });
+    }
+    returnEnemyToPreviousMode(){
+        this.setEnemyMode(null);
+        //this.setEnemyMode(enemies[0].modePrevious);
     }
     levelComplete(){
         this.level++;
@@ -147,9 +190,13 @@ class Game {
     resetToStartingPositions(){
         player.reset();
         enemies.forEach(enemy => {
+            enemy.mode = game.enemyModes.Wait;
+            enemy.modePrevious = game.enemyModes.Wait;
             enemy.reset();
         });
         this.started = false;
+        this.frightTimeStarted = 0;
+        this.ghostsEaten = 0;
     }
     gameOver(){
         maze.isInitialized = false;
@@ -159,6 +206,7 @@ class Game {
         this.level = 1;
         this.dotsToEat = 0;
         this.dotsEaten = 0;
+        this.extraLifeGiven = false;
         this.resetToStartingPositions();
         gameSounds.pacSiren.stop();
         gameSounds.intro.stop();
@@ -191,6 +239,26 @@ class Game {
         game.drawFooter();
         game.drawHeader();
 
+        //See if frighttime is over.
+        if (this.frightTimeStarted != 0){
+            let currentTime = floor((millis() - this.frightTimeStarted) / 1000);
+            if (currentTime > 2) {
+                if (currentTime % 2 != 0) {
+                    enemies.forEach(enemy => {
+                        enemy.isBlinking=true;
+                    });
+                }
+                else {
+                    enemies.forEach(enemy => {
+                        enemy.isBlinking=false;
+                    });
+                }
+            }
+
+            if (currentTime >= this.frightTime){
+                this.exitFrightenedMode();
+            }
+        }
 
         if (this.dotsEaten == this.dotsToEat){
             this.levelComplete();
